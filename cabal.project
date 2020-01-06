@@ -1,0 +1,4 @@
+packages: .
+
+package fused-effects-profile
+  ghc-options: -Werror
