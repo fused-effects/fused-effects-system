@@ -36,5 +36,9 @@ common common
 library
   import: common
   hs-source-dirs: src
+  exposed-modules:
+    Control.Effect.Profile
   build-depends:
       base >= 4.12 && < 5
+    , fused-effects ^>= 1
+    , text ^>= 1.2
