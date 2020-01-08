@@ -13,6 +13,7 @@ module Control.Carrier.Profile.Flat
 , reportProfile
 , execProfile
 , ProfileC(ProfileC)
+, Label
 , Timing(..)
 , renderTiming
 , mean
@@ -68,6 +69,8 @@ instance (Has (Lift IO) sig m, Effect sig) => Algebra (Profile :+: sig) (Profile
     timing ls t = Timings (HashMap.singleton ls (Timing t t t 1))
 
 
+type Label = Text
+
 data Timing = Timing
   { sum   :: !NominalDiffTime
   , min'  :: !NominalDiffTime
@@ -97,7 +100,7 @@ mean :: Timing -> NominalDiffTime
 mean Timing{ sum, count } = sum / fromIntegral count
 
 
-newtype Timings = Timings { unTimings :: HashMap.HashMap Text Timing }
+newtype Timings = Timings { unTimings :: HashMap.HashMap Label Timing }
 
 instance Semigroup Timings where
   Timings t1 <> Timings t2 = Timings (HashMap.unionWith (<>) t1 t2)
@@ -105,8 +108,8 @@ instance Semigroup Timings where
 instance Monoid Timings where
   mempty = Timings mempty
 
-lookup :: Text -> Timings -> Maybe Timing
-lookup = coerce @(Text -> HashMap.HashMap Text Timing -> _) HashMap.lookup
+lookup :: Label -> Timings -> Maybe Timing
+lookup = coerce @(Label -> HashMap.HashMap Label Timing -> _) HashMap.lookup
 
 renderTimings :: Timings -> Doc AnsiStyle
 renderTimings (Timings ts) = vsep (map go (sortOn (Down . mean . snd) (HashMap.toList ts))) where
