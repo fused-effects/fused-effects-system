@@ -7,6 +7,7 @@ module Data.Timing
 , mean
 , renderTiming
 , Label
+, label
 , Timings(..)
 , singleton
 , lookup
@@ -19,7 +20,7 @@ import           Data.Coerce
 import qualified Data.HashMap.Strict as HashMap
 import           Data.List (sortOn)
 import           Data.Ord (Down(..))
-import           Data.Text (Text)
+import           Data.Text (Text, pack)
 import           Data.Text.Prettyprint.Doc
 import           Data.Text.Prettyprint.Doc.Render.Terminal
 import           Data.Time.Clock
@@ -58,6 +59,9 @@ mean Timing{ sum, count } = sum / fromIntegral count
 
 
 type Label = Text
+
+label :: String -> Label
+label = pack
 
 newtype Timings = Timings { unTimings :: HashMap.HashMap Label Timing }
 
