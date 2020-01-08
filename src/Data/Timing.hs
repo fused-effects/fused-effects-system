@@ -6,6 +6,7 @@ module Data.Timing
 ( Timing(..)
 , mean
 , renderTiming
+, Label
 , Timings(..)
 , singleton
 , lookup
@@ -55,6 +56,8 @@ renderTiming t@Timing{ min', max', sub } = table (map go fields) <> if null (unT
 mean :: Timing -> NominalDiffTime
 mean Timing{ sum, count } = sum / fromIntegral count
 
+
+type Label = Text
 
 newtype Timings = Timings { unTimings :: HashMap.HashMap Text Timing }
 
