@@ -24,7 +24,6 @@ import Control.Effect.Profile
 import Control.Monad.IO.Class
 import Data.Time.Clock
 import Data.Timing
-import Prelude hiding (sum)
 
 runProfile :: ProfileC m a -> m (Timings, a)
 runProfile (ProfileC m) = runWriter m
