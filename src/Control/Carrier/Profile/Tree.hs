@@ -17,15 +17,14 @@ module Control.Carrier.Profile.Tree
 , module Data.Timing
 ) where
 
-import           Control.Algebra
-import           Control.Carrier.Lift
-import           Control.Carrier.Writer.Strict
-import           Control.Effect.Profile
-import           Control.Monad.IO.Class
-import qualified Data.HashMap.Strict as HashMap
-import           Data.Time.Clock
-import           Data.Timing
-import           Prelude hiding (sum)
+import Control.Algebra
+import Control.Carrier.Lift
+import Control.Carrier.Writer.Strict
+import Control.Effect.Profile
+import Control.Monad.IO.Class
+import Data.Time.Clock
+import Data.Timing
+import Prelude hiding (sum)
 
 runProfile :: ProfileC m a -> m (Timings, a)
 runProfile (ProfileC m) = runWriter m
@@ -51,4 +50,4 @@ instance (Has (Lift IO) sig m, Effect sig) => Algebra (Profile :+: sig) (Profile
       k a
     R other -> ProfileC (send (handleCoercible other))
     where
-    timing ls t = Timings . HashMap.singleton ls . Timing t t t 1
+    timing l t = singleton l . Timing t t t 1
