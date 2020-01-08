@@ -17,6 +17,7 @@ module Control.Carrier.Profile.Flat
 , renderTiming
 , mean
 , Timings(..)
+, delete
 , renderTimings
 , reportTimings
   -- * Profile effect
@@ -28,6 +29,7 @@ import           Control.Carrier.Lift
 import           Control.Carrier.Writer.Strict
 import           Control.Effect.Profile
 import           Control.Monad.IO.Class
+import           Data.Coerce
 import qualified Data.HashMap.Strict as HashMap
 import           Data.List (sortOn)
 import           Data.Ord (Down(..))
@@ -102,6 +104,9 @@ instance Semigroup Timings where
 
 instance Monoid Timings where
   mempty = Timings mempty
+
+delete :: Text -> Timings -> Timings
+delete = coerce @(Text -> HashMap.HashMap Text Timing -> _) HashMap.delete
 
 renderTimings :: Timings -> Doc AnsiStyle
 renderTimings (Timings ts) = vsep (map go (sortOn (Down . mean . snd) (HashMap.toList ts))) where
