@@ -8,6 +8,7 @@ module Data.Timing
 , renderTiming
 , Timings(..)
 , singleton
+, lookup
 , renderTimings
 , reportTimings
 ) where
@@ -22,6 +23,7 @@ import           Data.Text.Prettyprint.Doc
 import           Data.Text.Prettyprint.Doc.Render.Terminal
 import           Data.Time.Clock
 import           Numeric (showFFloat)
+import           Prelude hiding (lookup)
 import           System.IO (stderr)
 
 data Timing = Timing
@@ -64,6 +66,9 @@ instance Monoid Timings where
 
 singleton :: Text -> Timing -> Timings
 singleton = coerce @(Text -> Timing -> _) HashMap.singleton
+
+lookup :: Text -> Timings -> Maybe Timing
+lookup = coerce @(Text -> HashMap.HashMap Text Timing -> _) HashMap.lookup
 
 renderTimings :: Timings -> Doc AnsiStyle
 renderTimings (Timings ts) = vsep (map go (sortOn (Down . mean . snd) (HashMap.toList ts))) where
