@@ -59,7 +59,7 @@ mean Timing{ sum, count } = sum / fromIntegral count
 
 type Label = Text
 
-newtype Timings = Timings { unTimings :: HashMap.HashMap Text Timing }
+newtype Timings = Timings { unTimings :: HashMap.HashMap Label Timing }
 
 instance Semigroup Timings where
   Timings t1 <> Timings t2 = Timings (HashMap.unionWith (<>) t1 t2)
@@ -67,11 +67,11 @@ instance Semigroup Timings where
 instance Monoid Timings where
   mempty = Timings mempty
 
-singleton :: Text -> Timing -> Timings
-singleton = coerce @(Text -> Timing -> _) HashMap.singleton
+singleton :: Label -> Timing -> Timings
+singleton = coerce @(Label -> Timing -> _) HashMap.singleton
 
-lookup :: Text -> Timings -> Maybe Timing
-lookup = coerce @(Text -> HashMap.HashMap Text Timing -> _) HashMap.lookup
+lookup :: Label -> Timings -> Maybe Timing
+lookup = coerce @(Label -> HashMap.HashMap Label Timing -> _) HashMap.lookup
 
 renderTimings :: Timings -> Doc AnsiStyle
 renderTimings (Timings ts) = vsep (map go (sortOn (Down . mean . snd) (HashMap.toList ts))) where
