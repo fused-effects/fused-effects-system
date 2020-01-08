@@ -37,6 +37,7 @@ library
   import: common
   hs-source-dirs: src
   exposed-modules:
+    Control.Carrier.Profile.Flat
     Control.Carrier.Profile.Identity
     Control.Carrier.Profile.Tree
     Control.Effect.Profile
