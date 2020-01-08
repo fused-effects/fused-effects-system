@@ -7,11 +7,13 @@ module Data.Timing
 , mean
 , renderTiming
 , Timings(..)
+, singleton
 , renderTimings
 , reportTimings
 ) where
 
 import           Control.Effect.Lift
+import           Data.Coerce
 import qualified Data.HashMap.Strict as HashMap
 import           Data.List (sortOn)
 import           Data.Ord (Down(..))
@@ -59,6 +61,9 @@ instance Semigroup Timings where
 
 instance Monoid Timings where
   mempty = Timings mempty
+
+singleton :: Text -> Timing -> Timings
+singleton = coerce @(Text -> Timing -> _) HashMap.singleton
 
 renderTimings :: Timings -> Doc AnsiStyle
 renderTimings (Timings ts) = vsep (map go (sortOn (Down . mean . snd) (HashMap.toList ts))) where
