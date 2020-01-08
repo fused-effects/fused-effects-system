@@ -41,6 +41,7 @@ library
     Control.Carrier.Profile.Identity
     Control.Carrier.Profile.Tree
     Control.Effect.Profile
+    Data.Timing
   build-depends:
       base >= 4.12 && < 5
     , fused-effects ^>= 1
