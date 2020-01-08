@@ -17,6 +17,7 @@ module Control.Carrier.Profile.Flat
 , renderTiming
 , mean
 , Timings(..)
+, lookup
 , delete
 , renderTimings
 , reportTimings
@@ -38,7 +39,7 @@ import           Data.Text.Prettyprint.Doc
 import           Data.Text.Prettyprint.Doc.Render.Terminal
 import           Data.Time.Clock
 import           Numeric (showFFloat)
-import           Prelude hiding (sum)
+import           Prelude hiding (lookup, sum)
 import           System.IO (stderr)
 
 runProfile :: ProfileC m a -> m (Timings, a)
@@ -104,6 +105,9 @@ instance Semigroup Timings where
 
 instance Monoid Timings where
   mempty = Timings mempty
+
+lookup :: Text -> Timings -> Maybe Timing
+lookup = coerce @(Text -> HashMap.HashMap Text Timing -> _) HashMap.lookup
 
 delete :: Text -> Timings -> Timings
 delete = coerce @(Text -> HashMap.HashMap Text Timing -> _) HashMap.delete
