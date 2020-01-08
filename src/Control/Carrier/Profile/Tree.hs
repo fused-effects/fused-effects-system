@@ -11,14 +11,10 @@ module Control.Carrier.Profile.Tree
 , reportProfile
 , execProfile
 , ProfileC(ProfileC)
-, Timing(..)
-, renderTiming
-, mean
-, Timings(..)
-, renderTimings
-, reportTimings
   -- * Profile effect
 , module Control.Effect.Profile
+  -- * Timings
+, module Data.Timing
 ) where
 
 import           Control.Algebra
