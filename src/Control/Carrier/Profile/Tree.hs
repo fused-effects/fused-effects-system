@@ -7,7 +7,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Control.Carrier.Profile.Time
+module Control.Carrier.Profile.Tree
 ( -- * Profile carrier
   runProfile
 , reportProfile
