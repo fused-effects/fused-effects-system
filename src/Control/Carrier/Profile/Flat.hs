@@ -18,7 +18,6 @@ module Control.Carrier.Profile.Flat
 , mean
 , Timings(..)
 , lookup
-, delete
 , renderTimings
 , reportTimings
   -- * Profile effect
@@ -109,9 +108,6 @@ instance Monoid Timings where
 
 lookup :: Text -> Timings -> Maybe Timing
 lookup = coerce @(Text -> HashMap.HashMap Text Timing -> _) HashMap.lookup
-
-delete :: Text -> Timings -> Timings
-delete = coerce @(Text -> HashMap.HashMap Text Timing -> _) HashMap.delete
 
 renderTimings :: Timings -> Doc AnsiStyle
 renderTimings (Timings ts) = vsep (map go (sortOn (Down . mean . snd) (HashMap.toList ts))) where
