@@ -17,7 +17,6 @@ module Control.Carrier.Profile.Flat
 , renderTiming
 , mean
 , Timings(..)
-, lookup
 , renderTimings
 , reportTimings
   -- * Profile effect
