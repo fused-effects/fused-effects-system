@@ -57,13 +57,13 @@ instance (Has (Lift IO) sig m, Effect sig) => Algebra (Profile :+: sig) (Profile
   alg = \case
     L (Measure l m k) -> do
       start <- sendM getCurrentTime
-      (sub, a) <- ProfileC (censor @Timings (const mempty) (listen (runProfileC m)))
+      (_, a) <- ProfileC (censor @Timings (const mempty) (listen @Timings (runProfileC m)))
       end <- sendM getCurrentTime
-      ProfileC (tell (timing l (end `diffUTCTime` start) sub))
+      ProfileC (tell (timing l (end `diffUTCTime` start)))
       k a
     R other -> ProfileC (send (handleCoercible other))
     where
-    timing ls t = Timings . HashMap.singleton ls . Timing t t t 1
+    timing ls t = Timings (HashMap.singleton ls (Timing t t t 1))
 
 
 data Timing = Timing
@@ -71,17 +71,16 @@ data Timing = Timing
   , min'  :: !NominalDiffTime
   , max'  :: !NominalDiffTime
   , count :: {-# UNPACK #-} !Int
-  , sub   :: !Timings
   }
 
 instance Semigroup Timing where
-  Timing s1 mn1 mx1 c1 sb1 <> Timing s2 mn2 mx2 c2 sb2 = Timing (s1 + s2) (mn1 `min` mn2) (mx1 `max` mx2) (c1 + c2) (sb1 <> sb2)
+  Timing s1 mn1 mx1 c1 <> Timing s2 mn2 mx2 c2 = Timing (s1 + s2) (mn1 `min` mn2) (mx1 `max` mx2) (c1 + c2)
 
 instance Monoid Timing where
-  mempty = Timing 0 0 0 0 mempty
+  mempty = Timing 0 0 0 0
 
 renderTiming :: Timing -> Doc AnsiStyle
-renderTiming t@Timing{ min', max', sub } = table (map go fields) <> if null (unTimings sub) then mempty else nest 2 (line <> renderTimings sub)
+renderTiming t@Timing{ min', max' } = table (map go fields) <> line
     where
     table = group . encloseSep (flatAlt "{ " "{") (flatAlt " }" "}") ", "
     fields =
