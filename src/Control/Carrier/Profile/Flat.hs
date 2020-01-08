@@ -52,6 +52,7 @@ instance (Has (Lift IO) sig m, Effect sig) => Algebra (Profile :+: sig) (Profile
       (sub, a) <- ProfileC (listen @Timings (runProfileC m))
       end <- sendM getCurrentTime
       let t = lookup l sub
+      -- subtract re-entrant measurements so we don’t count them twice
       ProfileC (tell (timing l ((end `diffUTCTime` start) - maybe 0 sum t)))
       k a
     R other -> ProfileC (send (handleCoercible other))
