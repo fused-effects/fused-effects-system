@@ -25,8 +25,10 @@ newtype ProfileC m a = ProfileC { runProfile :: m a }
 
 instance MonadTrans ProfileC where
   lift = ProfileC
+  {-# INLINE lift #-}
 
 instance Algebra sig m => Algebra (Profile :+: sig) (ProfileC m) where
   alg = \case
     L (Measure _ m k) -> m >>= k
     R other           -> ProfileC (send (handleCoercible other))
+  {-# INLINE alg #-}
