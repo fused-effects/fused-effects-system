@@ -37,9 +37,11 @@ library
   import: common
   hs-source-dirs: src
   exposed-modules:
+    Control.Carrier.Profile.Flat
     Control.Carrier.Profile.Identity
     Control.Carrier.Profile.Tree
     Control.Effect.Profile
+    Data.Timing
   build-depends:
       base >= 4.12 && < 5
     , fused-effects ^>= 1
@@ -47,4 +49,5 @@ library
     , prettyprinter-ansi-terminal ^>= 1.1
     , text ^>= 1.2
     , time ^>= 1.9
+    , transformers >= 0.4 && < 0.6
     , unordered-containers ^>= 0.2

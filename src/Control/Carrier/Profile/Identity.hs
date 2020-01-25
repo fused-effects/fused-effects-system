@@ -13,11 +13,18 @@ module Control.Carrier.Profile.Identity
 ) where
 
 import Control.Algebra
+import Control.Applicative (Alternative)
 import Control.Effect.Profile
+import Control.Monad (MonadPlus)
+import Control.Monad.Fix
 import Control.Monad.IO.Class
+import Control.Monad.Trans.Class
 
 newtype ProfileC m a = ProfileC { runProfile :: m a }
-  deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
+  deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus)
+
+instance MonadTrans ProfileC where
+  lift = ProfileC
 
 instance Algebra sig m => Algebra (Profile :+: sig) (ProfileC m) where
   alg = \case
