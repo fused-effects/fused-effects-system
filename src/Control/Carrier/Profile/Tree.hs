@@ -54,3 +54,4 @@ instance (Has (Lift IO) sig m, Effect sig) => Algebra (Profile :+: sig) (Profile
     R other -> ProfileC (send (handleCoercible other))
     where
     timing l t = singleton l . Timing t t t 1
+  {-# INLINE alg #-}
