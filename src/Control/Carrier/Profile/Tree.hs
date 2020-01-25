@@ -18,6 +18,7 @@ module Control.Carrier.Profile.Tree
 ) where
 
 import Control.Algebra
+import Control.Applicative (Alternative)
 import Control.Carrier.Lift
 import Control.Carrier.Writer.Strict
 import Control.Effect.Profile
@@ -38,7 +39,7 @@ execProfile :: Functor m => ProfileC m a -> m Timings
 execProfile = fmap fst . runProfile
 
 newtype ProfileC m a = ProfileC { runProfileC :: WriterC Timings m a }
-  deriving (Applicative, Functor, Monad, MonadFail, MonadFix, MonadIO)
+  deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadFix, MonadIO)
 
 instance (Has (Lift IO) sig m, Effect sig) => Algebra (Profile :+: sig) (ProfileC m) where
   alg = \case
