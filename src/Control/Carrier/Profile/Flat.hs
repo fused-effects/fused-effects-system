@@ -37,14 +37,17 @@ import Prelude hiding (lookup, sum)
 
 runProfile :: ProfileC m a -> m (Timings, a)
 runProfile (ProfileC m) = runWriter m
+{-# INLINE runProfile #-}
 
 reportProfile :: Has (Lift IO) sig m => ProfileC m a -> m a
 reportProfile m = do
   (t, a) <- runProfile m
   a <$ reportTimings t
+{-# INLINE reportProfile #-}
 
 execProfile :: Functor m => ProfileC m a -> m Timings
 execProfile = fmap fst . runProfile
+{-# INLINE execProfile #-}
 
 newtype ProfileC m a = ProfileC { runProfileC :: WriterC Timings m a }
   deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans)
