@@ -26,6 +26,7 @@ import Control.Algebra
 import Control.Carrier.Lift
 import Control.Carrier.Writer.Strict
 import Control.Effect.Profile
+import Control.Monad.Fix
 import Control.Monad.IO.Class
 import Data.Time.Clock
 import Data.Timing
@@ -43,7 +44,7 @@ execProfile :: Functor m => ProfileC m a -> m Timings
 execProfile = fmap fst . runProfile
 
 newtype ProfileC m a = ProfileC { runProfileC :: WriterC Timings m a }
-  deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
+  deriving (Applicative, Functor, Monad, MonadFail, MonadFix, MonadIO)
 
 instance (Has (Lift IO) sig m, Effect sig) => Algebra (Profile :+: sig) (ProfileC m) where
   alg = \case
