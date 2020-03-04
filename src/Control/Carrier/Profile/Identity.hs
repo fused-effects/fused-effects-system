@@ -28,7 +28,7 @@ instance MonadTrans ProfileC where
   {-# INLINE lift #-}
 
 instance Algebra sig m => Algebra (Profile :+: sig) (ProfileC m) where
-  alg = \case
-    L (Measure _ m k) -> m >>= k
-    R other           -> ProfileC (send (handleCoercible other))
+  alg ctx hdl = \case
+    L (Measure _ m k) -> hdl (m <$ ctx) >>= hdl . fmap k
+    R other           -> ProfileC (alg ctx (runProfile . hdl) other)
   {-# INLINE alg #-}
