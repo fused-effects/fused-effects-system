@@ -5,7 +5,6 @@ module Control.Effect.Profile
 , Profile(..)
   -- * Re-exports
 , Algebra
-, Effect
 , Has
 , run
 ) where
@@ -21,7 +20,3 @@ data Profile m k
   = forall a . Measure Text (m a) (a -> m k)
 
 deriving instance Functor m => Functor (Profile m)
-
-instance Effect Profile where
-  thread ctx hdl (Measure l m k) = Measure l (hdl (m <$ ctx)) (hdl . fmap k)
-  {-# INLINE thread #-}
