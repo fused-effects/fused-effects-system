@@ -46,7 +46,7 @@ execProfile = fmap fst . runProfile
 newtype ProfileC m a = ProfileC { runProfileC :: WriterC Timings m a }
   deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans)
 
-instance (Has (Lift IO) sig m, Effect sig) => Algebra (Profile :+: sig) (ProfileC m) where
+instance Has (Lift IO) sig m => Algebra (Profile :+: sig) (ProfileC m) where
   alg = \case
     L (Measure l m k) -> do
       start <- sendM getCurrentTime
