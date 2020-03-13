@@ -28,6 +28,6 @@ instance MonadTrans ProfileC where
 
 instance Algebra sig m => Algebra (Profile :+: sig) (ProfileC m) where
   alg hdl sig ctx = case sig of
-    L (Measure _ m k) -> hdl (m <$ ctx) >>= hdl . fmap k
-    R other           -> ProfileC (alg (runProfile . hdl) other ctx)
+    L (Measure _ m) -> hdl (m <$ ctx)
+    R other         -> ProfileC (alg (runProfile . hdl) other ctx)
   {-# INLINE alg #-}

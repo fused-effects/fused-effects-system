@@ -1,6 +1,4 @@
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE GADTs #-}
 module Control.Effect.Profile
 ( -- * Profile effect
   measure
@@ -15,10 +13,8 @@ import Control.Algebra
 import Data.Text
 
 measure :: Has Profile sig m => Text -> m a -> m a
-measure l m = send (Measure l m pure)
+measure l m = send (Measure l m)
 {-# INLINE measure #-}
 
-data Profile m k
-  = forall a . Measure Text (m a) (a -> m k)
-
-deriving instance Functor m => Functor (Profile m)
+data Profile m k where
+  Measure :: Text -> m a -> Profile m a

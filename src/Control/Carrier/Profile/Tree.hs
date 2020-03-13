@@ -47,13 +47,12 @@ newtype ProfileC m a = ProfileC { runProfileC :: WriterC Timings m a }
 
 instance Has (Lift IO) sig m => Algebra (Profile :+: sig) (ProfileC m) where
   alg hdl sig ctx = case sig of
-    L (Measure l m k) -> do
+    L (Measure l m) -> do
       start <- sendM getCurrentTime
       (sub, a) <- ProfileC (censor @Timings (const mempty) (listen (runProfileC (hdl (m <$ ctx)))))
       end <- sendM getCurrentTime
-      ProfileC (tell (timing l (end `diffUTCTime` start) sub))
-      hdl (fmap k a)
-    R other -> ProfileC (alg (runProfileC . hdl) (R other) ctx)
+      a <$ ProfileC (tell (timing l (end `diffUTCTime` start) sub))
+    R other         -> ProfileC (alg (runProfileC . hdl) (R other) ctx)
     where
     timing l t = singleton l . Timing t t t 1
   {-# INLINE alg #-}
