@@ -1,6 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
@@ -53,7 +52,7 @@ newtype ProfileC m a = ProfileC { runProfileC :: WriterC Timings m a }
   deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans)
 
 instance Has (Lift IO) sig m => Algebra (Profile :+: sig) (ProfileC m) where
-  alg ctx hdl = \case
+  alg hdl sig ctx = case sig of
     L (Measure l m k) -> do
       start <- sendM getCurrentTime
       (sub, a) <- ProfileC (listen @Timings (runProfileC (hdl (m <$ ctx))))
@@ -62,7 +61,7 @@ instance Has (Lift IO) sig m => Algebra (Profile :+: sig) (ProfileC m) where
       -- subtract re-entrant measurements so we don’t count them twice
       ProfileC (tell (timing l ((end `diffUTCTime` start) - maybe 0 sum t)))
       hdl (fmap k a)
-    R other -> ProfileC (alg ctx (runProfileC . hdl) (R other))
+    R other -> ProfileC (alg (runProfileC . hdl) (R other) ctx)
     where
     timing l t = singleton l (Timing t t t 1 mempty)
   {-# INLINE alg #-}
