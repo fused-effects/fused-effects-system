@@ -24,7 +24,7 @@ module Control.Carrier.Profile.Flat
 import Control.Algebra
 import Control.Applicative (Alternative)
 import Control.Carrier.Lift
-import Control.Carrier.Writer.Strict
+import Control.Carrier.Writer.Church
 import Control.Effect.Profile
 import Control.Monad (MonadPlus)
 import Control.Monad.Fix
@@ -34,8 +34,8 @@ import Data.Time.Clock
 import Data.Timing
 import Prelude hiding (lookup, sum)
 
-runProfile :: ProfileC m a -> m (Timings, a)
-runProfile (ProfileC m) = runWriter m
+runProfile :: Applicative m => ProfileC m a -> m (Timings, a)
+runProfile = runWriter (curry pure) . runProfileC
 {-# INLINE runProfile #-}
 
 reportProfile :: Has (Lift IO) sig m => ProfileC m a -> m a
@@ -44,8 +44,8 @@ reportProfile m = do
   a <$ reportTimings t
 {-# INLINE reportProfile #-}
 
-execProfile :: Functor m => ProfileC m a -> m Timings
-execProfile = fmap fst . runProfile
+execProfile :: Applicative m => ProfileC m a -> m Timings
+execProfile = execWriter . runProfileC
 {-# INLINE execProfile #-}
 
 newtype ProfileC m a = ProfileC { runProfileC :: WriterC Timings m a }
