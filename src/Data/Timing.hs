@@ -103,6 +103,7 @@ newtype Instant = Instant { getInstant :: SystemTime }
 
 since :: Instant -> Instant -> Duration
 since (Instant (MkSystemTime bs bns)) (Instant (MkSystemTime as ans)) = Duration (MkSystemTime (as - bs) (ans - bns))
+{-# INLINABLE since #-}
 
 
 newtype Duration = Duration { getDuration :: SystemTime }
