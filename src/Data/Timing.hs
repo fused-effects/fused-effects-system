@@ -116,3 +116,4 @@ instance Monoid Duration where
 
 now :: Has (Lift IO) sig m => m Instant
 now = Instant <$> sendIO getSystemTime
+{-# INLINABLE now #-}
