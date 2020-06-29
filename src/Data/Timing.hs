@@ -13,6 +13,7 @@ module Data.Timing
 , lookup
 , renderTimings
 , reportTimings
+, Instant(..)
 , Duration(..)
 , now
 ) where
@@ -96,6 +97,9 @@ reportTimings :: Has (Lift IO) sig m => Timings -> m ()
 reportTimings = sendM . renderIO stderr . layoutPretty defaultLayoutOptions . (<> line) . renderTimings
 
 
+newtype Instant = Instant { getInstant :: SystemTime }
+
+
 newtype Duration = Duration { getDuration :: SystemTime }
 
 instance Semigroup Duration where
@@ -104,5 +108,5 @@ instance Semigroup Duration where
 instance Monoid Duration where
   mempty = Duration (MkSystemTime 0 0)
 
-now :: Has (Lift IO) sig m => m Duration
-now = Duration <$> sendIO getSystemTime
+now :: Has (Lift IO) sig m => m Instant
+now = Instant <$> sendIO getSystemTime
