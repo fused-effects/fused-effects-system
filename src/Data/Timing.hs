@@ -16,7 +16,6 @@ module Data.Timing
 , Instant(..)
 , since
 , Duration(..)
-, durationToFrac
 , now
 ) where
 
@@ -114,9 +113,6 @@ instance Semigroup Duration where
 
 instance Monoid Duration where
   mempty = Duration (MkSystemTime 0 0)
-
-durationToFrac :: Fractional a => Duration -> a
-durationToFrac (Duration (MkSystemTime s ns)) = realToFrac s + realToFrac ns * 10^^(-12)
 
 now :: Has (Lift IO) sig m => m Instant
 now = Instant <$> sendIO getSystemTime
