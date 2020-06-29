@@ -116,7 +116,7 @@ instance Monoid Duration where
   mempty = Duration (MkSystemTime 0 0)
 
 durationToFrac :: Fractional a => Duration -> a
-durationToFrac (Duration (MkSystemTime s ns)) = realToFrac s + realToFrac ns * 10^^(-9 :: Integer)
+durationToFrac (Duration (MkSystemTime s ns)) = realToFrac s + realToFrac ns * 10^^(-12 :: Integer)
 
 now :: Has (Lift IO) sig m => m Instant
 now = Instant <$> sendIO getSystemTime
