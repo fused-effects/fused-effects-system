@@ -14,6 +14,7 @@ module Data.Timing
 , renderTimings
 , reportTimings
 , Duration(..)
+, now
 ) where
 
 import           Control.Effect.Lift
@@ -102,3 +103,6 @@ instance Semigroup Duration where
 
 instance Monoid Duration where
   mempty = Duration (MkSystemTime 0 0)
+
+now :: Has (Lift IO) sig m => m Duration
+now = Duration <$> sendIO getSystemTime
