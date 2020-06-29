@@ -14,6 +14,7 @@ module Data.Timing
 , renderTimings
 , reportTimings
 , Instant(..)
+, since
 , Duration(..)
 , now
 ) where
@@ -98,6 +99,9 @@ reportTimings = sendM . renderIO stderr . layoutPretty defaultLayoutOptions . (<
 
 
 newtype Instant = Instant { getInstant :: SystemTime }
+
+since :: Instant -> Instant -> Duration
+since (Instant (MkSystemTime bs bns)) (Instant (MkSystemTime as ans)) = Duration (MkSystemTime (as - bs) (ans - bns))
 
 
 newtype Duration = Duration { getDuration :: SystemTime }
