@@ -99,12 +99,14 @@ reportTimings = sendM . renderIO stderr . layoutPretty defaultLayoutOptions . (<
 
 
 newtype Instant = Instant { getInstant :: SystemTime }
+  deriving (Eq, Ord, Show)
 
 since :: Instant -> Instant -> Duration
 since (Instant (MkSystemTime bs bns)) (Instant (MkSystemTime as ans)) = Duration (MkSystemTime (as - bs) (ans - bns))
 
 
 newtype Duration = Duration { getDuration :: SystemTime }
+  deriving (Eq, Ord, Show)
 
 instance Semigroup Duration where
   Duration (MkSystemTime s1 ns1) <> Duration (MkSystemTime s2 ns2) = Duration (MkSystemTime (s1 + s2) (ns1 + ns2))
