@@ -99,3 +99,6 @@ newtype Duration = Duration { getDuration :: SystemTime }
 
 instance Semigroup Duration where
   Duration (MkSystemTime s1 ns1) <> Duration (MkSystemTime s2 ns2) = Duration (MkSystemTime (s1 + s2) (ns1 + ns2))
+
+instance Monoid Duration where
+  mempty = Duration (MkSystemTime 0 0)
