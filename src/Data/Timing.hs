@@ -17,21 +17,21 @@ module Data.Timing
 
 import           Control.Effect.Lift
 import           Data.Coerce
+import           Data.Fixed (Pico)
 import qualified Data.HashMap.Strict as HashMap
 import           Data.List (sortOn)
 import           Data.Ord (Down(..))
 import           Data.Text (Text, pack)
 import           Data.Text.Prettyprint.Doc
 import           Data.Text.Prettyprint.Doc.Render.Terminal
-import           Data.Time.Clock
 import           Numeric (showFFloat)
 import           Prelude hiding (lookup)
 import           System.IO (stderr)
 
 data Timing = Timing
-  { sum   :: !NominalDiffTime
-  , min'  :: !NominalDiffTime
-  , max'  :: !NominalDiffTime
+  { sum   :: !Pico
+  , min'  :: !Pico
+  , max'  :: !Pico
   , count :: {-# UNPACK #-} !Int
   , sub   :: !Timings
   }
@@ -56,7 +56,7 @@ renderTiming t@Timing{ min', max', sub } = table (map go fields) <> if null (unT
     go (k, v) = k <> colon <+> v
     prettyMS = (<> annotate (colorDull White) "ms") . pretty . ($ "") . showFFloat @Double (Just 3) . (* 1000) . realToFrac
 
-mean :: Timing -> NominalDiffTime
+mean :: Timing -> Pico
 mean Timing{ sum, count } = sum / fromIntegral count
 {-# INLINE mean #-}
 
