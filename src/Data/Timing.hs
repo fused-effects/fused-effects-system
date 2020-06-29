@@ -13,6 +13,7 @@ module Data.Timing
 , lookup
 , renderTimings
 , reportTimings
+, Duration(..)
 ) where
 
 import           Control.Effect.Lift
@@ -24,6 +25,7 @@ import           Data.Text (Text, pack)
 import           Data.Text.Prettyprint.Doc
 import           Data.Text.Prettyprint.Doc.Render.Terminal
 import           Data.Time.Clock
+import           Data.Time.Clock.System
 import           Numeric (showFFloat)
 import           Prelude hiding (lookup)
 import           System.IO (stderr)
@@ -91,3 +93,6 @@ renderTimings (Timings ts) = vsep (map go (sortOn (Down . mean . snd) (HashMap.t
 
 reportTimings :: Has (Lift IO) sig m => Timings -> m ()
 reportTimings = sendM . renderIO stderr . layoutPretty defaultLayoutOptions . (<> line) . renderTimings
+
+
+newtype Duration = Duration { getDuration :: SystemTime }
