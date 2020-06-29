@@ -29,16 +29,15 @@ import           Data.Ord (Down(..))
 import           Data.Text (Text, pack)
 import           Data.Text.Prettyprint.Doc
 import           Data.Text.Prettyprint.Doc.Render.Terminal
-import           Data.Time.Clock
 import           Data.Time.Clock.System
 import           Numeric (showFFloat)
 import           Prelude hiding (lookup)
 import           System.IO (stderr)
 
 data Timing = Timing
-  { sum   :: !NominalDiffTime
-  , min'  :: !NominalDiffTime
-  , max'  :: !NominalDiffTime
+  { sum   :: !Duration
+  , min'  :: !Duration
+  , max'  :: !Duration
   , count :: {-# UNPACK #-} !Int
   , sub   :: !Timings
   }
@@ -63,7 +62,7 @@ renderTiming t@Timing{ min', max', sub } = table (map go fields) <> if null (unT
     go (k, v) = k <> colon <+> v
     prettyMS = (<> annotate (colorDull White) "ms") . pretty . ($ "") . showFFloat @Double (Just 3) . (* 1000) . realToFrac
 
-mean :: Timing -> NominalDiffTime
+mean :: Timing -> Duration
 mean Timing{ sum, count } = sum / fromIntegral count
 {-# INLINE mean #-}
 
@@ -104,7 +103,7 @@ newtype Instant = Instant { getInstant :: SystemTime }
   deriving (Eq, Ord, Show)
 
 since :: Instant -> Instant -> Duration
-since (Instant (MkSystemTime bs bns)) (Instant (MkSystemTime as ans)) = Duration (MkSystemTime (as - bs) (ans - bns))
+since (Instant (MkSystemTime bs bns)) (Instant (MkSystemTime as ans)) = Duration (realToFrac (as - bs) + MkFixed (fromIntegral (ans - bns)))
 {-# INLINABLE since #-}
 
 
