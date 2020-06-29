@@ -103,7 +103,7 @@ newtype Instant = Instant { getInstant :: SystemTime }
   deriving (Eq, Ord, Show)
 
 since :: Instant -> Instant -> Duration
-since (Instant (MkSystemTime bs bns)) (Instant (MkSystemTime as ans)) = Duration (realToFrac (as - bs) + MkFixed (fromIntegral (ans - bns)))
+since (Instant (MkSystemTime bs bns)) (Instant (MkSystemTime as ans)) = Duration (realToFrac (as - bs) + MkFixed (fromIntegral ans - fromIntegral bns))
 {-# INLINABLE since #-}
 
 
