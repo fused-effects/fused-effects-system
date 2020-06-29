@@ -26,6 +26,7 @@ import Control.Monad.Fix
 import Control.Monad.IO.Class
 import Control.Monad.Trans.Class
 import Data.Time.Clock
+import Data.Time.Clock.System
 import Data.Timing
 
 runProfile :: Applicative m => ProfileC m a -> m (Timings, a)
@@ -48,9 +49,9 @@ newtype ProfileC m a = ProfileC { runProfileC :: WriterC Timings m a }
 instance Has (Lift IO) sig m => Algebra (Profile :+: sig) (ProfileC m) where
   alg hdl sig ctx = case sig of
     L (Measure l m) -> do
-      start <- sendM getCurrentTime
+      start <- systemToUTCTime <$> sendM getSystemTime
       (sub, a) <- ProfileC (censor @Timings (const mempty) (listen (runProfileC (hdl (m <$ ctx)))))
-      end <- sendM getCurrentTime
+      end <- systemToUTCTime <$> sendM getSystemTime
       a <$ ProfileC (tell (timing l (end `diffUTCTime` start) sub))
     R other         -> ProfileC (alg (runProfileC . hdl) (R other) ctx)
     where
