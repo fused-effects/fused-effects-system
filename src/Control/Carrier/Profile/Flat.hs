@@ -30,7 +30,6 @@ import Control.Monad (MonadPlus)
 import Control.Monad.Fix
 import Control.Monad.IO.Class
 import Control.Monad.Trans.Class
-import Data.Time.Clock
 import Data.Timing
 import Prelude hiding (lookup, sum)
 
@@ -54,12 +53,12 @@ newtype ProfileC m a = ProfileC { runProfileC :: WriterC Timings m a }
 instance Has (Lift IO) sig m => Algebra (Profile :+: sig) (ProfileC m) where
   alg hdl sig ctx = case sig of
     L (Measure l m) -> do
-      start <- sendM getCurrentTime
+      start <- now
       (sub, a) <- ProfileC (listen @Timings (runProfileC (hdl (m <$ ctx))))
-      end <- sendM getCurrentTime
+      duration <- since start <$> now
       let t = lookup l sub
       -- subtract re-entrant measurements so we don’t count them twice
-      a <$ ProfileC (tell (timing l ((end `diffUTCTime` start) - maybe 0 sum t)))
+      a <$ ProfileC (tell (timing l (duration - maybe 0 sum t)))
     R other         -> ProfileC (alg (runProfileC . hdl) (R other) ctx)
     where
     timing l t = singleton l (Timing t t t 1 mempty)
