@@ -1,6 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
@@ -25,7 +24,7 @@ module Control.Carrier.Profile.Flat
 import Control.Algebra
 import Control.Applicative (Alternative)
 import Control.Carrier.Lift
-import Control.Carrier.Writer.Strict
+import Control.Carrier.Writer.Church
 import Control.Effect.Profile
 import Control.Monad (MonadPlus)
 import Control.Monad.Fix
@@ -35,8 +34,8 @@ import Data.Time.Clock
 import Data.Timing
 import Prelude hiding (lookup, sum)
 
-runProfile :: ProfileC m a -> m (Timings, a)
-runProfile (ProfileC m) = runWriter m
+runProfile :: Applicative m => ProfileC m a -> m (Timings, a)
+runProfile = runWriter (curry pure) . runProfileC
 {-# INLINE runProfile #-}
 
 reportProfile :: Has (Lift IO) sig m => ProfileC m a -> m a
@@ -45,24 +44,23 @@ reportProfile m = do
   a <$ reportTimings t
 {-# INLINE reportProfile #-}
 
-execProfile :: Functor m => ProfileC m a -> m Timings
-execProfile = fmap fst . runProfile
+execProfile :: Applicative m => ProfileC m a -> m Timings
+execProfile = execWriter . runProfileC
 {-# INLINE execProfile #-}
 
 newtype ProfileC m a = ProfileC { runProfileC :: WriterC Timings m a }
   deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans)
 
-instance (Has (Lift IO) sig m, Effect sig) => Algebra (Profile :+: sig) (ProfileC m) where
-  alg = \case
-    L (Measure l m k) -> do
+instance Has (Lift IO) sig m => Algebra (Profile :+: sig) (ProfileC m) where
+  alg hdl sig ctx = case sig of
+    L (Measure l m) -> do
       start <- sendM getCurrentTime
-      (sub, a) <- ProfileC (listen @Timings (runProfileC m))
+      (sub, a) <- ProfileC (listen @Timings (runProfileC (hdl (m <$ ctx))))
       end <- sendM getCurrentTime
       let t = lookup l sub
       -- subtract re-entrant measurements so we don’t count them twice
-      ProfileC (tell (timing l ((end `diffUTCTime` start) - maybe 0 sum t)))
-      k a
-    R other -> ProfileC (send (handleCoercible other))
+      a <$ ProfileC (tell (timing l ((end `diffUTCTime` start) - maybe 0 sum t)))
+    R other         -> ProfileC (alg (runProfileC . hdl) (R other) ctx)
     where
     timing l t = singleton l (Timing t t t 1 mempty)
   {-# INLINE alg #-}

@@ -1,6 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
@@ -28,7 +27,7 @@ instance MonadTrans ProfileC where
   {-# INLINE lift #-}
 
 instance Algebra sig m => Algebra (Profile :+: sig) (ProfileC m) where
-  alg = \case
-    L (Measure _ m k) -> m >>= k
-    R other           -> ProfileC (send (handleCoercible other))
+  alg hdl sig ctx = case sig of
+    L (Measure _ m) -> hdl (m <$ ctx)
+    R other         -> ProfileC (alg (runProfile . hdl) other ctx)
   {-# INLINE alg #-}
