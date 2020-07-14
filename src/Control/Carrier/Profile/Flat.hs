@@ -58,7 +58,7 @@ instance Has (Lift IO) sig m => Algebra (Profile :+: sig) (ProfileC m) where
       duration <- since start <$> now
       let t = lookup l sub
       -- subtract re-entrant measurements so we don’t count them twice
-      a <$ ProfileC (tell (timing l (duration - maybe 0 sum t)))
+      a <$ ProfileC (tell (timing l (maybe duration ((duration -) . sum) t)))
     R other         -> ProfileC (alg (runProfileC . hdl) (R other) ctx)
     where
     timing l t = singleton l (Timing t t t 1 mempty)
