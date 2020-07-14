@@ -4,7 +4,7 @@ name:                fused-effects-profile
 version:             0.0.0.0
 synopsis:            Profiling without recompiling, via fused-effects.
 description:         Profiling for Haskell programs without recompiling, via fused-effects.
-homepage:            https://github.com/fused-effects/fused-effects-profile
+homepage:            https://github.com/fused-effects/fused-effects-profile/tree/master/fused-effects-profile
 bug-reports:         https://github.com/fused-effects/fused-effects-profile/issues
 license:             BSD-3-Clause
 license-file:        LICENSE
