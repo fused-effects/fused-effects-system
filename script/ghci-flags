@@ -21,7 +21,7 @@ function flags {
   echo "-hidir $build_products_dir"
   echo "-stubdir $build_products_dir"
 
-  echo "-isrc"
+  echo "-ifused-effects-profile/src"
 
   echo "-hide-all-packages"
 

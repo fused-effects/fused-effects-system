@@ -7,4 +7,4 @@ cd $(dirname "$0")/..
 
 echo "cabal.project"
 
-echo "fused-effects-profile.cabal"
+echo "fused-effects-profile/fused-effects-profile.cabal"
