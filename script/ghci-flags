@@ -22,6 +22,7 @@ function flags {
   echo "-stubdir $build_products_dir"
 
   echo "-ifused-effects-profile/src"
+  echo "-ifused-effects-time/src"
 
   echo "-hide-all-packages"
 
