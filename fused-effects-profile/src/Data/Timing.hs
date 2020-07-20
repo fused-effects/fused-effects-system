@@ -59,17 +59,18 @@ renderTiming t@Timing{ total, count, min', max', sub } = table (map go fields) <
     where
     table = group . encloseSep (flatAlt "{ " "{") (flatAlt " }" "}") ", "
     fields
-      | count == 1 = [ (green "total", prettyMS total) ]
+      | count == 1 = [ (green "total", prettyMS (realToFrac total)) ]
       | otherwise  =
-        [ (green "total", prettyMS total)
+        [ (green "total", prettyMS (realToFrac total))
         , (green "count", pretty   count)
-        , (green "min",   prettyMS min')
-        , (green "mean",  prettyMS (mean t))
-        , (green "max",   prettyMS max')
+        , (green "min",   prettyMS (realToFrac min'))
+        , (green "mean",  prettyMS (realToFrac (mean t)))
+        , (green "max",   prettyMS (realToFrac max'))
+        , (green "std.dev.", prettyMS (stdDev t))
         ]
     go (k, v) = k <> colon <+> v
     green = annotate (colorDull Green)
-    prettyMS = (<> annotate (colorDull White) "ms") . pretty . ($ "") . showFFloat @Double (Just 3) . (* 1000) . realToFrac
+    prettyMS = (<> annotate (colorDull White) "ms") . pretty . ($ "") . showFFloat @Double (Just 3) . (* 1000)
 
 mean :: Timing -> Duration
 mean Timing{ total, count }
