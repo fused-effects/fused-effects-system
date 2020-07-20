@@ -1,9 +1,11 @@
 {-# LANGUAGE DisambiguateRecordFields #-}
+{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 module Data.Timing
-( Total(..)
+( Unital(..)
+, Total(..)
 , Count(..)
 , Timing(..)
 , mean
@@ -32,6 +34,10 @@ import           Data.Text.Prettyprint.Doc.Render.Terminal
 import           Numeric (showFFloat)
 import           Prelude hiding (lookup)
 import           System.IO (stderr)
+
+class Monoid m => Unital a m | m -> a where
+  unit :: a -> m
+
 
 newtype Total = Total { getTotal :: Duration }
   deriving (Eq, Ord, Show)
