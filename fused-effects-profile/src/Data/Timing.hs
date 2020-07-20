@@ -6,6 +6,7 @@
 module Data.Timing
 ( Timing(..)
 , mean
+, variance
 , renderTiming
 , Label
 , label
@@ -74,6 +75,10 @@ mean Timing{ total, count }
   | count == 0 = 0
   | otherwise  = total / fromIntegral count
 {-# INLINE mean #-}
+
+variance :: Timing -> Duration
+variance Timing{ count, sumsq } = sumsq / fromIntegral count
+{-# INLINE variance #-}
 
 
 type Label = Text
