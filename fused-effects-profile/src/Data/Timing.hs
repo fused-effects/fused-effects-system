@@ -19,6 +19,7 @@ module Data.Timing
 , Duration(..)
 ) where
 
+import           Control.Carrier.Time.System
 import           Control.Effect.Lift
 import           Data.Coerce
 import           Data.Fixed
@@ -97,8 +98,6 @@ renderTimings (Timings ts) = vsep (map go (sortOn (Down . mean . snd) (HashMap.t
 reportTimings :: Has (Lift IO) sig m => Timings -> m ()
 reportTimings = sendM . renderIO stderr . layoutPretty defaultLayoutOptions . (<> line) . renderTimings
 
-
-type Instant = SystemTime
 
 since :: Instant -> Instant -> Duration
 since (MkSystemTime bs bns) (MkSystemTime as ans) = Duration (realToFrac (as - bs) + MkFixed (fromIntegral ans - fromIntegral bns))

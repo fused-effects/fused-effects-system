@@ -6,7 +6,8 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Control.Carrier.Time.System
 ( -- * Time carrier
-  TimeC(..)
+  Instant
+, TimeC(..)
   -- * Time effect
 , module Control.Effect.Time
 ) where
@@ -20,6 +21,9 @@ import Control.Monad.Fix (MonadFix)
 import Control.Monad.IO.Class (MonadIO)
 import Control.Monad.Trans.Class (MonadTrans(..))
 import Data.Time.Clock.System
+
+type Instant = SystemTime
+
 
 newtype TimeC m a = TimeC { runTime :: m a }
   deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus)
