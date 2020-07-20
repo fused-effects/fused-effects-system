@@ -55,10 +55,10 @@ renderTiming t@Timing{ total, min', max', count, sub } = table (map go fields) <
       | count == 1 = [ (green "total", prettyMS total) ]
       | otherwise  =
         [ (green "total", prettyMS total)
-        , (green "count", pretty count)
-        , (green "min", prettyMS min')
-        , (green "mean", prettyMS (mean t))
-        , (green "max", prettyMS max')
+        , (green "count", pretty   count)
+        , (green "min",   prettyMS min')
+        , (green "mean",  prettyMS (mean t))
+        , (green "max",   prettyMS max')
         ]
     go (k, v) = k <> colon <+> v
     green = annotate (colorDull Green)
