@@ -37,11 +37,19 @@ data Timing = Timing
   , count :: {-# UNPACK #-} !Int
   , min'  :: !Duration
   , max'  :: !Duration
+  , sumsq :: !Duration
   , sub   :: !Timings
   }
 
 instance Semigroup Timing where
-  Timing t1 c1 mn1 mx1 sb1 <> Timing t2 c2 mn2 mx2 sb2 = Timing (t1 + t2) (c1 + c2) (mn1 `min` mn2) (mx1 `max` mx2) (sb1 <> sb2)
+  Timing t1 c1 mn1 mx1 sq1 sb1 <> Timing t2 c2 mn2 mx2 sq2 sb2 = Timing (t1 + t2) (c1 + c2) (mn1 `min` mn2) (mx1 `max` mx2) sq' (sb1 <> sb2)
+    where
+    c1' = fromIntegral c1
+    c2' = fromIntegral c2
+    nom = (t1 * c2' - t2 * c1') ^ (2 :: Int)
+    sq' | c1 == 0   = sq2
+        | c2 == 0   = sq1
+        | otherwise = sq1 + sq2 + nom / ((c1' + c2') * c1' * c2')
   {-# INLINE (<>) #-}
 
 renderTiming :: Timing -> Doc AnsiStyle
@@ -83,7 +91,7 @@ instance Monoid Timings where
   {-# INLINE mempty #-}
 
 singleton :: Label -> Duration -> Timings -> Timings
-singleton l t = Timings . HashMap.singleton l . Timing t 1 t t
+singleton l t = Timings . HashMap.singleton l . Timing t 1 t t 0
 
 lookup :: Label -> Timings -> Maybe Timing
 lookup = coerce @(Label -> HashMap.HashMap Label Timing -> _) HashMap.lookup
