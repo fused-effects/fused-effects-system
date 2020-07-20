@@ -57,6 +57,6 @@ instance Has (Time Instant) sig m => Algebra (Profile :+: sig) (ProfileC m) wher
       (sub, (duration, a)) <- ProfileC (listen @Timings (runProfileC (time (hdl (m <$ ctx)))))
       let t = lookup l sub
       -- subtract re-entrant measurements so we don’t count them twice
-      a <$ ProfileC (tell (timing l (maybe duration ((duration -) . total) t) mempty))
+      a <$ ProfileC (tell (singleton l (maybe duration ((duration -) . total) t) mempty))
     R other         -> ProfileC (alg (runProfileC . hdl) (R other) ctx)
   {-# INLINE alg #-}
