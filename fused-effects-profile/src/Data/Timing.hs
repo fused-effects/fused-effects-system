@@ -61,6 +61,9 @@ instance Semigroup Count where
 instance Monoid Count where
   mempty = Count 0
 
+instance Unital Duration Count where
+  unit _ = Count 1
+
 
 data Timing = Timing
   { total :: !Total
