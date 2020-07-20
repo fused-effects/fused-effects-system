@@ -7,6 +7,7 @@ module Data.Timing
 ( Timing(..)
 , mean
 , variance
+, stdDev
 , renderTiming
 , Label
 , label
@@ -79,6 +80,10 @@ mean Timing{ total, count }
 variance :: Timing -> Duration
 variance Timing{ count, sumsq } = sumsq / fromIntegral count
 {-# INLINE variance #-}
+
+stdDev :: Timing -> Double
+stdDev = sqrt . realToFrac . variance
+{-# INLINE stdDev #-}
 
 
 type Label = Text
