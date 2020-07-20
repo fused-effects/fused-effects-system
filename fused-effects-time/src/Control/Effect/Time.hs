@@ -15,6 +15,7 @@ import Data.Kind (Type)
 
 now :: Has (Time instant) sig m => m instant
 now = send Now
+{-# INLINE now #-}
 
 data Time instant (m :: Type -> Type) k where
   Now :: Time instant m instant
