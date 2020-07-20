@@ -1,12 +1,10 @@
 {-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 module Data.Timing
-( Unital(..)
-, Timing(..)
+( Timing(..)
 , mean
 , renderTiming
 , Label
@@ -34,10 +32,6 @@ import           Numeric (showFFloat)
 import           Prelude hiding (lookup)
 import           System.IO (stderr)
 
-class Semigroup m => Unital a m | m -> a where
-  unit :: a -> m
-
-
 data Timing = Timing
   { total :: !Duration
   , count :: {-# UNPACK #-} !Int
@@ -49,10 +43,6 @@ data Timing = Timing
 instance Semigroup Timing where
   Timing s1 c1 mn1 mx1 sb1 <> Timing s2 c2 mn2 mx2 sb2 = Timing (s1 + s2) (c1 + c2) (mn1 `min` mn2) (mx1 `max` mx2) (sb1 <> sb2)
   {-# INLINE (<>) #-}
-
-instance Unital Duration Timing where
-  unit t = Timing t 1 t t mempty
-  {-# INLINE unit #-}
 
 renderTiming :: Timing -> Doc AnsiStyle
 renderTiming t@Timing{ total, count, min', max', sub } = table (map go fields) <> if null (unTimings sub) then mempty else nest 2 (line <> renderTimings sub)
