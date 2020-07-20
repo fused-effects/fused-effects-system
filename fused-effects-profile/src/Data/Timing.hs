@@ -1,10 +1,13 @@
 {-# LANGUAGE DisambiguateRecordFields #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 module Data.Timing
 ( Timing(..)
 , mean
+, variance
+, stdDev
 , renderTiming
 , Label
 , label
@@ -32,36 +35,56 @@ import           Prelude hiding (lookup)
 import           System.IO (stderr)
 
 data Timing = Timing
-  { sum   :: !Duration
+  { total :: !Duration
+  , count :: {-# UNPACK #-} !Int
   , min'  :: !Duration
   , max'  :: !Duration
-  , count :: {-# UNPACK #-} !Int
+  , sumsq :: !Duration
   , sub   :: !Timings
   }
 
 instance Semigroup Timing where
-  Timing s1 mn1 mx1 c1 sb1 <> Timing s2 mn2 mx2 c2 sb2 = Timing (s1 + s2) (mn1 `min` mn2) (mx1 `max` mx2) (c1 + c2) (sb1 <> sb2)
+  Timing t1 c1 mn1 mx1 sq1 sb1 <> Timing t2 c2 mn2 mx2 sq2 sb2 = Timing (t1 + t2) (c1 + c2) (mn1 `min` mn2) (mx1 `max` mx2) sq' (sb1 <> sb2)
+    where
+    c1' = fromIntegral c1
+    c2' = fromIntegral c2
+    nom = (t1 * c2' - t2 * c1') ^ (2 :: Int)
+    sq' | c1 == 0   = sq2
+        | c2 == 0   = sq1
+        | otherwise = sq1 + sq2 + nom / ((c1' + c2') * c1' * c2')
   {-# INLINE (<>) #-}
 
-instance Monoid Timing where
-  mempty = Timing 0 0 0 0 mempty
-  {-# INLINE mempty #-}
-
 renderTiming :: Timing -> Doc AnsiStyle
-renderTiming t@Timing{ min', max', sub } = table (map go fields) <> if null (unTimings sub) then mempty else nest 2 (line <> renderTimings sub)
+renderTiming t@Timing{ total, count, min', max', sub } = table (map go fields) <> if null (unTimings sub) then mempty else nest 2 (line <> renderTimings sub)
     where
     table = group . encloseSep (flatAlt "{ " "{") (flatAlt " }" "}") ", "
-    fields =
-      [ (annotate (colorDull Green) "min", prettyMS min')
-      , (annotate (colorDull Green) "mean", prettyMS (mean t))
-      , (annotate (colorDull Green) "max", prettyMS max')
-      ]
+    fields
+      | count == 1 = [ (green "total", prettyMS (realToFrac total)) ]
+      | otherwise  =
+        [ (green "total", prettyMS (realToFrac total))
+        , (green "count", pretty   count)
+        , (green "min",   prettyMS (realToFrac min'))
+        , (green "mean",  prettyMS (realToFrac (mean t)))
+        , (green "max",   prettyMS (realToFrac max'))
+        , (green "std.dev.", prettyMS (stdDev t))
+        ]
     go (k, v) = k <> colon <+> v
-    prettyMS = (<> annotate (colorDull White) "ms") . pretty . ($ "") . showFFloat @Double (Just 3) . (* 1000) . realToFrac
+    green = annotate (colorDull Green)
+    prettyMS = (<> annotate (colorDull White) "ms") . pretty . ($ "") . showFFloat @Double (Just 3) . (* 1000)
 
 mean :: Timing -> Duration
-mean Timing{ sum, count } = sum / fromIntegral count
+mean Timing{ total, count }
+  | count == 0 = 0
+  | otherwise  = total / fromIntegral count
 {-# INLINE mean #-}
+
+variance :: Timing -> Duration
+variance Timing{ count, sumsq } = sumsq / fromIntegral count
+{-# INLINE variance #-}
+
+stdDev :: Timing -> Double
+stdDev = sqrt . realToFrac . variance
+{-# INLINE stdDev #-}
 
 
 type Label = Text
@@ -80,8 +103,8 @@ instance Monoid Timings where
   mempty = Timings mempty
   {-# INLINE mempty #-}
 
-singleton :: Label -> Timing -> Timings
-singleton = coerce @(Label -> Timing -> _) HashMap.singleton
+singleton :: Label -> Duration -> Timings -> Timings
+singleton l t = Timings . HashMap.singleton l . Timing t 1 t t 0
 {-# INLINE singleton #-}
 
 lookup :: Label -> Timings -> Maybe Timing
