@@ -37,7 +37,7 @@ import           Numeric (showFFloat)
 import           Prelude hiding (lookup)
 import           System.IO (stderr)
 
-class Monoid m => Unital a m | m -> a where
+class Semigroup m => Unital a m | m -> a where
   unit :: a -> m
 
 
