@@ -6,7 +6,6 @@
 {-# LANGUAGE TypeApplications #-}
 module Data.Timing
 ( Unital(..)
-, Total(..)
 , Timing(..)
 , mean
 , renderTiming
@@ -39,24 +38,8 @@ class Semigroup m => Unital a m | m -> a where
   unit :: a -> m
 
 
-newtype Total = Total { getTotal :: Duration }
-  deriving (Eq, Ord, Show)
-
-instance Semigroup Total where
-  (<>) = coerce ((+) :: Duration -> Duration -> Duration)
-  {-# INLINE (<>) #-}
-
-instance Monoid Total where
-  mempty = Total 0
-  {-# INLINE mempty #-}
-
-instance Unital Duration Total where
-  unit = Total
-  {-# INLINE unit #-}
-
-
 data Timing = Timing
-  { total :: !Total
+  { total :: !Duration
   , count :: {-# UNPACK #-} !Int
   , min'  :: !Duration
   , max'  :: !Duration
@@ -64,11 +47,11 @@ data Timing = Timing
   }
 
 instance Semigroup Timing where
-  Timing s1 c1 mn1 mx1 sb1 <> Timing s2 c2 mn2 mx2 sb2 = Timing (s1 <> s2) (c1 + c2) (mn1 `min` mn2) (mx1 `max` mx2) (sb1 <> sb2)
+  Timing s1 c1 mn1 mx1 sb1 <> Timing s2 c2 mn2 mx2 sb2 = Timing (s1 + s2) (c1 + c2) (mn1 `min` mn2) (mx1 `max` mx2) (sb1 <> sb2)
   {-# INLINE (<>) #-}
 
 instance Unital Duration Timing where
-  unit t = Timing (unit t) 1 t t mempty
+  unit t = Timing t 1 t t mempty
   {-# INLINE unit #-}
 
 renderTiming :: Timing -> Doc AnsiStyle
@@ -76,9 +59,9 @@ renderTiming t@Timing{ total, count, min', max', sub } = table (map go fields) <
     where
     table = group . encloseSep (flatAlt "{ " "{") (flatAlt " }" "}") ", "
     fields
-      | count == 1 = [ (green "total", prettyMS (getTotal total)) ]
+      | count == 1 = [ (green "total", prettyMS total) ]
       | otherwise  =
-        [ (green "total", prettyMS (getTotal total))
+        [ (green "total", prettyMS total)
         , (green "count", pretty   count)
         , (green "min",   prettyMS min')
         , (green "mean",  prettyMS (mean t))
@@ -89,7 +72,7 @@ renderTiming t@Timing{ total, count, min', max', sub } = table (map go fields) <
     prettyMS = (<> annotate (colorDull White) "ms") . pretty . ($ "") . showFFloat @Double (Just 3) . (* 1000) . realToFrac
 
 mean :: Timing -> Duration
-mean Timing{ total, count } = getTotal total / fromIntegral count
+mean Timing{ total, count } = total / fromIntegral count
 {-# INLINE mean #-}
 
 
