@@ -24,9 +24,9 @@ module Control.Carrier.Profile.Flat
 import Control.Algebra
 import Control.Applicative (Alternative)
 import Control.Carrier.Lift
+import Control.Carrier.Time.System
 import Control.Carrier.Writer.Church
 import Control.Effect.Profile
-import Control.Effect.Time
 import Control.Monad (MonadPlus)
 import Control.Monad.Fix
 import Control.Monad.IO.Class
@@ -54,9 +54,7 @@ newtype ProfileC m a = ProfileC { runProfileC :: WriterC Timings m a }
 instance Has (Time Instant) sig m => Algebra (Profile :+: sig) (ProfileC m) where
   alg hdl sig ctx = case sig of
     L (Measure l m) -> do
-      start <- now
-      (sub, a) <- ProfileC (listen @Timings (runProfileC (hdl (m <$ ctx))))
-      duration <- since start <$> now
+      (duration, (sub, a)) <- time (ProfileC (listen @Timings (runProfileC (hdl (m <$ ctx)))))
       let t = lookup l sub
       -- subtract re-entrant measurements so we don’t count them twice
       a <$ ProfileC (tell (timing l (maybe duration ((duration -) . sum) t)))
