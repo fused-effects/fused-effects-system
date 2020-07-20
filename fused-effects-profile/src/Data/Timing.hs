@@ -52,13 +52,14 @@ renderTiming t@Timing{ total, min', max', count, sub } = table (map go fields) <
     where
     table = group . encloseSep (flatAlt "{ " "{") (flatAlt " }" "}") ", "
     fields
-      | count == 1 = [ (annotate (colorDull Green) "total", prettyMS total) ]
+      | count == 1 = [ (green "total", prettyMS total) ]
       | otherwise  =
-        [ (annotate (colorDull Green) "min", prettyMS min')
-        , (annotate (colorDull Green) "mean", prettyMS (mean t))
-        , (annotate (colorDull Green) "max", prettyMS max')
+        [ (green "min", prettyMS min')
+        , (green "mean", prettyMS (mean t))
+        , (green "max", prettyMS max')
         ]
     go (k, v) = k <> colon <+> v
+    green = annotate (colorDull Green)
     prettyMS = (<> annotate (colorDull White) "ms") . pretty . ($ "") . showFFloat @Double (Just 3) . (* 1000) . realToFrac
 
 mean :: Timing -> Duration
