@@ -33,14 +33,14 @@ import           System.IO (stderr)
 
 data Timing = Timing
   { total :: !Duration
+  , count :: {-# UNPACK #-} !Int
   , min'  :: !Duration
   , max'  :: !Duration
-  , count :: {-# UNPACK #-} !Int
   , sub   :: !Timings
   }
 
 instance Semigroup Timing where
-  Timing s1 mn1 mx1 c1 sb1 <> Timing s2 mn2 mx2 c2 sb2 = Timing (s1 + s2) (mn1 `min` mn2) (mx1 `max` mx2) (c1 + c2) (sb1 <> sb2)
+  Timing s1 c1 mn1 mx1 sb1 <> Timing s2 c2 mn2 mx2 sb2 = Timing (s1 + s2) (c1 + c2) (mn1 `min` mn2) (mx1 `max` mx2) (sb1 <> sb2)
   {-# INLINE (<>) #-}
 
 instance Monoid Timing where
@@ -48,7 +48,7 @@ instance Monoid Timing where
   {-# INLINE mempty #-}
 
 renderTiming :: Timing -> Doc AnsiStyle
-renderTiming t@Timing{ total, min', max', count, sub } = table (map go fields) <> if null (unTimings sub) then mempty else nest 2 (line <> renderTimings sub)
+renderTiming t@Timing{ total, count, min', max', sub } = table (map go fields) <> if null (unTimings sub) then mempty else nest 2 (line <> renderTimings sub)
     where
     table = group . encloseSep (flatAlt "{ " "{") (flatAlt " }" "}") ", "
     fields

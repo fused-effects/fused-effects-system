@@ -60,5 +60,5 @@ instance Has (Time Instant) sig m => Algebra (Profile :+: sig) (ProfileC m) wher
       a <$ ProfileC (tell (timing l (maybe duration ((duration -) . total) t)))
     R other         -> ProfileC (alg (runProfileC . hdl) (R other) ctx)
     where
-    timing l t = singleton l (Timing t t t 1 mempty)
+    timing l t = singleton l (Timing t 1 t t mempty)
   {-# INLINE alg #-}
