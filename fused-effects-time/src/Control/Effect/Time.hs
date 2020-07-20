@@ -1,4 +1,5 @@
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE KindSignatures #-}
 module Control.Effect.Time
 ( -- * Time effect
   now
@@ -11,6 +12,7 @@ module Control.Effect.Time
 ) where
 
 import Control.Algebra
+import Data.Kind (Type)
 
 now :: Has (Time instant) sig m => m instant
 now = send Now
@@ -20,6 +22,6 @@ timeWith :: Has (Time instant) sig m => (instant -> instant -> delta) -> m a -> 
 timeWith with m = send (TimeWith with m)
 {-# INLINE timeWith #-}
 
-data Time instant m k where
+data Time instant (m :: Type -> Type) k where
   Now      ::                                         Time instant m instant
   TimeWith :: (instant -> instant -> delta) -> m a -> Time instant m (delta, a)
