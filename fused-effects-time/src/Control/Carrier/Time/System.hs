@@ -9,6 +9,7 @@ module Control.Carrier.Time.System
   Instant
 , Duration(..)
 , since
+, time
 , TimeC(..)
   -- * Time effect
 , module Control.Effect.Time
@@ -34,6 +35,10 @@ newtype Duration = Duration { getDuration :: Nano }
 since :: Instant -> Instant -> Duration
 since (MkSystemTime bs bns) (MkSystemTime as ans) = Duration (realToFrac (as - bs) + MkFixed (fromIntegral ans - fromIntegral bns))
 {-# INLINABLE since #-}
+
+time :: Has (Time Instant) sig m => m a -> m (Duration, a)
+time = timeWith since
+{-# INLINE time #-}
 
 
 newtype TimeC m a = TimeC { runTime :: m a }
