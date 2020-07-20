@@ -7,7 +7,6 @@
 module Data.Timing
 ( Unital(..)
 , Total(..)
-, Count(..)
 , Timing(..)
 , mean
 , renderTiming
@@ -56,36 +55,20 @@ instance Unital Duration Total where
   {-# INLINE unit #-}
 
 
-newtype Count = Count { getCount :: Int }
-  deriving (Eq, Ord, Show)
-
-instance Semigroup Count where
-  (<>) = coerce ((+) :: Int -> Int -> Int)
-  {-# INLINE (<>) #-}
-
-instance Monoid Count where
-  mempty = Count 0
-  {-# INLINE mempty #-}
-
-instance Unital Duration Count where
-  unit _ = Count 1
-  {-# INLINE unit #-}
-
-
 data Timing = Timing
   { total :: !Total
-  , count :: {-# UNPACK #-} !Count
+  , count :: {-# UNPACK #-} !Int
   , min'  :: !Duration
   , max'  :: !Duration
   , sub   :: !Timings
   }
 
 instance Semigroup Timing where
-  Timing s1 c1 mn1 mx1 sb1 <> Timing s2 c2 mn2 mx2 sb2 = Timing (s1 <> s2) (c1 <> c2) (mn1 `min` mn2) (mx1 `max` mx2) (sb1 <> sb2)
+  Timing s1 c1 mn1 mx1 sb1 <> Timing s2 c2 mn2 mx2 sb2 = Timing (s1 <> s2) (c1 + c2) (mn1 `min` mn2) (mx1 `max` mx2) (sb1 <> sb2)
   {-# INLINE (<>) #-}
 
 instance Unital Duration Timing where
-  unit t = Timing (unit t) (unit t) t t mempty
+  unit t = Timing (unit t) 1 t t mempty
   {-# INLINE unit #-}
 
 renderTiming :: Timing -> Doc AnsiStyle
@@ -93,10 +76,10 @@ renderTiming t@Timing{ total, count, min', max', sub } = table (map go fields) <
     where
     table = group . encloseSep (flatAlt "{ " "{") (flatAlt " }" "}") ", "
     fields
-      | count == Count 1 = [ (green "total", prettyMS (getTotal total)) ]
-      | otherwise        =
+      | count == 1 = [ (green "total", prettyMS (getTotal total)) ]
+      | otherwise  =
         [ (green "total", prettyMS (getTotal total))
-        , (green "count", pretty   (getCount count))
+        , (green "count", pretty   count)
         , (green "min",   prettyMS min')
         , (green "mean",  prettyMS (mean t))
         , (green "max",   prettyMS max')
@@ -106,7 +89,7 @@ renderTiming t@Timing{ total, count, min', max', sub } = table (map go fields) <
     prettyMS = (<> annotate (colorDull White) "ms") . pretty . ($ "") . showFFloat @Double (Just 3) . (* 1000) . realToFrac
 
 mean :: Timing -> Duration
-mean Timing{ total, count } = getTotal total / fromIntegral (getCount count)
+mean Timing{ total, count } = getTotal total / fromIntegral count
 {-# INLINE mean #-}
 
 
