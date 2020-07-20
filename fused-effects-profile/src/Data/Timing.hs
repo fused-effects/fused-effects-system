@@ -105,10 +105,6 @@ instance Semigroup Timing where
   Timing s1 c1 mn1 mx1 sb1 <> Timing s2 c2 mn2 mx2 sb2 = Timing (s1 <> s2) (c1 <> c2) (mn1 <> mn2) (mx1 <> mx2) (sb1 <> sb2)
   {-# INLINE (<>) #-}
 
-instance Monoid Timing where
-  mempty = Timing mempty mempty mempty mempty mempty
-  {-# INLINE mempty #-}
-
 renderTiming :: Timing -> Doc AnsiStyle
 renderTiming t@Timing{ total, count, min', max', sub } = table (map go fields) <> if null (unTimings sub) then mempty else nest 2 (line <> renderTimings sub)
     where
