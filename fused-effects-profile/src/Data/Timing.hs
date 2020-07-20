@@ -70,7 +70,9 @@ renderTiming t@Timing{ total, count, min', max', sub } = table (map go fields) <
     prettyMS = (<> annotate (colorDull White) "ms") . pretty . ($ "") . showFFloat @Double (Just 3) . (* 1000) . realToFrac
 
 mean :: Timing -> Duration
-mean Timing{ total, count } = total / fromIntegral count
+mean Timing{ total, count }
+  | count == 0 = 0
+  | otherwise  = total / fromIntegral count
 {-# INLINE mean #-}
 
 
