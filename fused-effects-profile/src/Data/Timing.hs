@@ -3,7 +3,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 module Data.Timing
-( Timing(..)
+( Total(..)
+, Timing(..)
 , mean
 , renderTiming
 , Label
@@ -30,6 +31,16 @@ import           Data.Text.Prettyprint.Doc.Render.Terminal
 import           Numeric (showFFloat)
 import           Prelude hiding (lookup)
 import           System.IO (stderr)
+
+newtype Total = Total { getTotal :: Duration }
+  deriving (Eq, Ord, Show)
+
+instance Semigroup Total where
+  (<>) = coerce ((+) :: Duration -> Duration -> Duration)
+
+instance Monoid Total where
+  mempty = Total 0
+
 
 data Timing = Timing
   { total :: !Duration
