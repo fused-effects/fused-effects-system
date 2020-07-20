@@ -1,10 +1,10 @@
 cabal-version:       2.2
 
-name:                fused-effects-profile
+name:                fused-effects-time
 version:             0.0.0.0
-synopsis:            Profiling without recompiling, via fused-effects.
-description:         Profiling for Haskell programs without recompiling, via fused-effects.
-homepage:            https://github.com/fused-effects/fused-effects-profile/tree/master/fused-effects-profile
+synopsis:            Timing via fused-effects.
+description:         Time measurement via fused-effects.
+homepage:            https://github.com/fused-effects/fused-effects-profile/tree/master/fused-effects-time
 bug-reports:         https://github.com/fused-effects/fused-effects-profile/issues
 license:             BSD-3-Clause
 license-file:        LICENSE
@@ -40,18 +40,10 @@ library
   import: common
   hs-source-dirs: src
   exposed-modules:
-    Control.Carrier.Profile.Flat
-    Control.Carrier.Profile.Identity
-    Control.Carrier.Profile.Tree
-    Control.Effect.Profile
-    Data.Timing
+    Control.Carrier.Time.System
+    Control.Effect.Time
   build-depends:
     , base >= 4.12 && < 5
     , fused-effects ^>= 1.1
-    , fused-effects-time ^>= 0
-    , prettyprinter ^>= 1.5
-    , prettyprinter-ansi-terminal ^>= 1.1
-    , text ^>= 1.2
     , time ^>= 1.9
     , transformers >= 0.4 && < 0.6
-    , unordered-containers ^>= 0.2

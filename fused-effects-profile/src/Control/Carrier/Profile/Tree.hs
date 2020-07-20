@@ -19,6 +19,7 @@ module Control.Carrier.Profile.Tree
 import Control.Algebra
 import Control.Applicative (Alternative)
 import Control.Carrier.Lift
+import Control.Carrier.Time.System
 import Control.Carrier.Writer.Church
 import Control.Effect.Profile
 import Control.Monad (MonadPlus)
@@ -44,12 +45,10 @@ execProfile = execWriter . runProfileC
 newtype ProfileC m a = ProfileC { runProfileC :: WriterC Timings m a }
   deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans)
 
-instance Has (Lift IO) sig m => Algebra (Profile :+: sig) (ProfileC m) where
+instance Has (Time Instant) sig m => Algebra (Profile :+: sig) (ProfileC m) where
   alg hdl sig ctx = case sig of
     L (Measure l m) -> do
-      start <- now
-      (sub, a) <- ProfileC (censor @Timings (const mempty) (listen (runProfileC (hdl (m <$ ctx)))))
-      duration <- since start <$> now
+      (sub, (duration, a)) <- ProfileC (censor @Timings (const mempty) (listen (runProfileC (time (hdl (m <$ ctx))))))
       a <$ ProfileC (tell (timing l duration sub))
     R other         -> ProfileC (alg (runProfileC . hdl) (R other) ctx)
     where

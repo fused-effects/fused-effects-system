@@ -1,5 +1,4 @@
 {-# LANGUAGE DisambiguateRecordFields #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
@@ -14,22 +13,20 @@ module Data.Timing
 , lookup
 , renderTimings
 , reportTimings
-, Instant(..)
-, since
+, Instant
 , Duration(..)
-, now
+, since
 ) where
 
+import           Control.Carrier.Time.System
 import           Control.Effect.Lift
 import           Data.Coerce
-import           Data.Fixed
 import qualified Data.HashMap.Strict as HashMap
 import           Data.List (sortOn)
 import           Data.Ord (Down(..))
 import           Data.Text (Text, pack)
 import           Data.Text.Prettyprint.Doc
 import           Data.Text.Prettyprint.Doc.Render.Terminal
-import           Data.Time.Clock.System
 import           Numeric (showFFloat)
 import           Prelude hiding (lookup)
 import           System.IO (stderr)
@@ -97,19 +94,3 @@ renderTimings (Timings ts) = vsep (map go (sortOn (Down . mean . snd) (HashMap.t
 
 reportTimings :: Has (Lift IO) sig m => Timings -> m ()
 reportTimings = sendM . renderIO stderr . layoutPretty defaultLayoutOptions . (<> line) . renderTimings
-
-
-newtype Instant = Instant { getInstant :: SystemTime }
-  deriving (Eq, Ord, Show)
-
-since :: Instant -> Instant -> Duration
-since (Instant (MkSystemTime bs bns)) (Instant (MkSystemTime as ans)) = Duration (realToFrac (as - bs) + MkFixed (fromIntegral ans - fromIntegral bns))
-{-# INLINABLE since #-}
-
-
-newtype Duration = Duration { getDuration :: Nano }
-  deriving (Eq, Fractional, Num, Ord, Real, Show)
-
-now :: Has (Lift IO) sig m => m Instant
-now = Instant <$> sendIO getSystemTime
-{-# INLINABLE now #-}
