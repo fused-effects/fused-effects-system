@@ -4,6 +4,7 @@
 {-# LANGUAGE TypeApplications #-}
 module Data.Timing
 ( Total(..)
+, Count(..)
 , Timing(..)
 , mean
 , renderTiming
@@ -40,6 +41,16 @@ instance Semigroup Total where
 
 instance Monoid Total where
   mempty = Total 0
+
+
+newtype Count = Count { getCount :: Int }
+  deriving (Eq, Ord, Show)
+
+instance Semigroup Count where
+  (<>) = coerce ((+) :: Int -> Int -> Int)
+
+instance Monoid Count where
+  mempty = Count 0
 
 
 data Timing = Timing
