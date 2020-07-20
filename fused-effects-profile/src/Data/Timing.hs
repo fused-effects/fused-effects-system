@@ -54,7 +54,8 @@ renderTiming t@Timing{ total, min', max', count, sub } = table (map go fields) <
     fields
       | count == 1 = [ (green "total", prettyMS total) ]
       | otherwise  =
-        [ (green "min", prettyMS min')
+        [ (green "total", prettyMS total)
+        , (green "min", prettyMS min')
         , (green "mean", prettyMS (mean t))
         , (green "max", prettyMS max')
         ]
