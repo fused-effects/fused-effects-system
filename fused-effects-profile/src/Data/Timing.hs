@@ -67,18 +67,18 @@ instance Unital Duration Count where
 
 data Timing = Timing
   { total :: !Total
-  , count :: {-# UNPACK #-} !Int
+  , count :: {-# UNPACK #-} !Count
   , min'  :: !Duration
   , max'  :: !Duration
   , sub   :: !Timings
   }
 
 instance Semigroup Timing where
-  Timing s1 c1 mn1 mx1 sb1 <> Timing s2 c2 mn2 mx2 sb2 = Timing (s1 <> s2) (c1 + c2) (mn1 `min` mn2) (mx1 `max` mx2) (sb1 <> sb2)
+  Timing s1 c1 mn1 mx1 sb1 <> Timing s2 c2 mn2 mx2 sb2 = Timing (s1 <> s2) (c1 <> c2) (mn1 `min` mn2) (mx1 `max` mx2) (sb1 <> sb2)
   {-# INLINE (<>) #-}
 
 instance Monoid Timing where
-  mempty = Timing mempty 0 0 0 mempty
+  mempty = Timing mempty mempty 0 0 mempty
   {-# INLINE mempty #-}
 
 renderTiming :: Timing -> Doc AnsiStyle
@@ -86,10 +86,10 @@ renderTiming t@Timing{ total, count, min', max', sub } = table (map go fields) <
     where
     table = group . encloseSep (flatAlt "{ " "{") (flatAlt " }" "}") ", "
     fields
-      | count == 1 = [ (green "total", prettyMS (getTotal total)) ]
-      | otherwise  =
+      | count == Count 1 = [ (green "total", prettyMS (getTotal total)) ]
+      | otherwise        =
         [ (green "total", prettyMS (getTotal total))
-        , (green "count", pretty   count)
+        , (green "count", pretty   (getCount count))
         , (green "min",   prettyMS min')
         , (green "mean",  prettyMS (mean t))
         , (green "max",   prettyMS max')
@@ -99,7 +99,7 @@ renderTiming t@Timing{ total, count, min', max', sub } = table (map go fields) <
     prettyMS = (<> annotate (colorDull White) "ms") . pretty . ($ "") . showFFloat @Double (Just 3) . (* 1000) . realToFrac
 
 mean :: Timing -> Duration
-mean Timing{ total, count } = getTotal total / fromIntegral count
+mean Timing{ total, count } = getTotal total / fromIntegral (getCount count)
 {-# INLINE mean #-}
 
 
