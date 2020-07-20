@@ -8,8 +8,6 @@ module Data.Timing
 ( Unital(..)
 , Total(..)
 , Count(..)
-, Min(..)
-, Max(..)
 , Timing(..)
 , mean
 , renderTiming
@@ -31,7 +29,6 @@ import           Data.Coerce
 import qualified Data.HashMap.Strict as HashMap
 import           Data.List (sortOn)
 import           Data.Ord (Down(..))
-import           Data.Semigroup (Max(..), Min(..))
 import           Data.Text (Text, pack)
 import           Data.Text.Prettyprint.Doc
 import           Data.Text.Prettyprint.Doc.Render.Terminal
@@ -75,30 +72,20 @@ instance Unital Duration Count where
   {-# INLINE unit #-}
 
 
-instance Ord a => Unital a (Min a) where
-  unit = Min
-  {-# INLINE unit #-}
-
-
-instance Ord a => Unital a (Max a) where
-  unit = Max
-  {-# INLINE unit #-}
-
-
 data Timing = Timing
   { total :: !Total
   , count :: {-# UNPACK #-} !Count
-  , min'  :: !(Min Duration)
-  , max'  :: !(Max Duration)
+  , min'  :: !Duration
+  , max'  :: !Duration
   , sub   :: !Timings
   }
 
 instance Semigroup Timing where
-  Timing s1 c1 mn1 mx1 sb1 <> Timing s2 c2 mn2 mx2 sb2 = Timing (s1 <> s2) (c1 <> c2) (mn1 <> mn2) (mx1 <> mx2) (sb1 <> sb2)
+  Timing s1 c1 mn1 mx1 sb1 <> Timing s2 c2 mn2 mx2 sb2 = Timing (s1 <> s2) (c1 <> c2) (mn1 `min` mn2) (mx1 `max` mx2) (sb1 <> sb2)
   {-# INLINE (<>) #-}
 
 instance Unital Duration Timing where
-  unit t = Timing (unit t) (unit t) (unit t) (unit t) mempty
+  unit t = Timing (unit t) (unit t) t t mempty
   {-# INLINE unit #-}
 
 renderTiming :: Timing -> Doc AnsiStyle
@@ -110,9 +97,9 @@ renderTiming t@Timing{ total, count, min', max', sub } = table (map go fields) <
       | otherwise        =
         [ (green "total", prettyMS (getTotal total))
         , (green "count", pretty   (getCount count))
-        , (green "min",   prettyMS (getMin min'))
+        , (green "min",   prettyMS min')
         , (green "mean",  prettyMS (mean t))
-        , (green "max",   prettyMS (getMax max'))
+        , (green "max",   prettyMS max')
         ]
     go (k, v) = k <> colon <+> v
     green = annotate (colorDull Green)
