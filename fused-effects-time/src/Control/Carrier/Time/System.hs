@@ -18,3 +18,4 @@ newtype TimeC m a = TimeC { runTime :: m a }
 
 instance MonadTrans TimeC where
   lift = TimeC
+  {-# INLINE lift #-}
