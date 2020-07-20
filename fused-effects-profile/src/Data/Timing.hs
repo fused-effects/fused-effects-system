@@ -7,6 +7,7 @@ module Data.Timing
 ( Unital(..)
 , Total(..)
 , Count(..)
+, Min(..)
 , Timing(..)
 , mean
 , renderTiming
@@ -63,6 +64,19 @@ instance Monoid Count where
 
 instance Unital Duration Count where
   unit _ = Count 1
+
+
+newtype Min = Min { getMin :: Duration }
+  deriving (Eq, Ord, Show)
+
+instance Semigroup Min where
+  (<>) = min
+
+instance Monoid Min where
+  mempty = Min 0
+
+instance Unital Duration Min where
+  unit = Min
 
 
 data Timing = Timing
