@@ -8,6 +8,7 @@ module Data.Timing
 , Total(..)
 , Count(..)
 , Min(..)
+, Max(..)
 , Timing(..)
 , mean
 , renderTiming
@@ -77,6 +78,19 @@ instance Monoid Min where
 
 instance Unital Duration Min where
   unit = Min
+
+
+newtype Max = Max { getMax :: Duration }
+  deriving (Eq, Ord, Show)
+
+instance Semigroup Max where
+  (<>) = max
+
+instance Monoid Max where
+  mempty = Max 0
+
+instance Unital Duration Max where
+  unit = Max
 
 
 data Timing = Timing
