@@ -48,14 +48,16 @@ instance Monoid Timing where
   {-# INLINE mempty #-}
 
 renderTiming :: Timing -> Doc AnsiStyle
-renderTiming t@Timing{ min', max', sub } = table (map go fields) <> if null (unTimings sub) then mempty else nest 2 (line <> renderTimings sub)
+renderTiming t@Timing{ sum, min', max', count, sub } = table (map go fields) <> if null (unTimings sub) then mempty else nest 2 (line <> renderTimings sub)
     where
     table = group . encloseSep (flatAlt "{ " "{") (flatAlt " }" "}") ", "
-    fields =
-      [ (annotate (colorDull Green) "min", prettyMS min')
-      , (annotate (colorDull Green) "mean", prettyMS (mean t))
-      , (annotate (colorDull Green) "max", prettyMS max')
-      ]
+    fields
+      | count == 1 = [ (annotate (colorDull Green) "total", prettyMS sum) ]
+      | otherwise  =
+        [ (annotate (colorDull Green) "min", prettyMS min')
+        , (annotate (colorDull Green) "mean", prettyMS (mean t))
+        , (annotate (colorDull Green) "max", prettyMS max')
+        ]
     go (k, v) = k <> colon <+> v
     prettyMS = (<> annotate (colorDull White) "ms") . pretty . ($ "") . showFFloat @Double (Just 3) . (* 1000) . realToFrac
 
