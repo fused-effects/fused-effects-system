@@ -1,2 +1,6 @@
 module Control.Carrier.Time.System
-() where
+( -- * Time carrier
+  TimeC(..)
+) where
+
+newtype TimeC m a = TimeC { runTime :: m a }
