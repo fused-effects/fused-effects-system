@@ -48,6 +48,9 @@ instance Semigroup Total where
 instance Monoid Total where
   mempty = Total 0
 
+instance Unital Duration Total where
+  unit = Total
+
 
 newtype Count = Count { getCount :: Int }
   deriving (Eq, Ord, Show)
