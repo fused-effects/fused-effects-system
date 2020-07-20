@@ -82,17 +82,17 @@ instance Unital Duration Min where
 data Timing = Timing
   { total :: !Total
   , count :: {-# UNPACK #-} !Count
-  , min'  :: !Duration
+  , min'  :: !Min
   , max'  :: !Duration
   , sub   :: !Timings
   }
 
 instance Semigroup Timing where
-  Timing s1 c1 mn1 mx1 sb1 <> Timing s2 c2 mn2 mx2 sb2 = Timing (s1 <> s2) (c1 <> c2) (mn1 `min` mn2) (mx1 `max` mx2) (sb1 <> sb2)
+  Timing s1 c1 mn1 mx1 sb1 <> Timing s2 c2 mn2 mx2 sb2 = Timing (s1 <> s2) (c1 <> c2) (mn1 <> mn2) (mx1 `max` mx2) (sb1 <> sb2)
   {-# INLINE (<>) #-}
 
 instance Monoid Timing where
-  mempty = Timing mempty mempty 0 0 mempty
+  mempty = Timing mempty mempty mempty 0 mempty
   {-# INLINE mempty #-}
 
 renderTiming :: Timing -> Doc AnsiStyle
@@ -104,7 +104,7 @@ renderTiming t@Timing{ total, count, min', max', sub } = table (map go fields) <
       | otherwise        =
         [ (green "total", prettyMS (getTotal total))
         , (green "count", pretty   (getCount count))
-        , (green "min",   prettyMS min')
+        , (green "min",   prettyMS (getMin min'))
         , (green "mean",  prettyMS (mean t))
         , (green "max",   prettyMS max')
         ]
