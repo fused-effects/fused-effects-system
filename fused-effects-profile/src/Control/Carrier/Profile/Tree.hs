@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
@@ -52,5 +53,5 @@ instance Has (Time Instant) sig m => Algebra (Profile :+: sig) (ProfileC m) wher
       a <$ ProfileC (tell (timing l duration sub))
     R other         -> ProfileC (alg (runProfileC . hdl) (R other) ctx)
     where
-    timing l t = singleton l . Timing (unit t) (unit t) (unit t) (unit t)
+    timing l t sub = singleton l (unit t){ sub }
   {-# INLINE alg #-}
