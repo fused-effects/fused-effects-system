@@ -57,7 +57,7 @@ instance Semigroup Timing where
 renderTiming :: Timing -> Doc AnsiStyle
 renderTiming t@Timing{ total, count, min', max', sub } = table (map go fields) <> if null (unTimings sub) then mempty else nest 2 (line <> renderTimings sub)
     where
-    table = group . encloseSep (flatAlt "{ " "{") (flatAlt " }" "}") ", "
+    table = group . nest 2 . mappend line . encloseSep (flatAlt "{ " "{") (flatAlt " }" "}") ", "
     fields
       | count == 1 = [ (green "total", prettyMS (realToFrac total)) ]
       | otherwise  =
