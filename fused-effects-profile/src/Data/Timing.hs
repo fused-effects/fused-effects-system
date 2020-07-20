@@ -14,10 +14,9 @@ module Data.Timing
 , lookup
 , renderTimings
 , reportTimings
-, Instant(..)
+, Instant
 , since
 , Duration(..)
-, now
 ) where
 
 import           Control.Effect.Lift
@@ -99,17 +98,12 @@ reportTimings :: Has (Lift IO) sig m => Timings -> m ()
 reportTimings = sendM . renderIO stderr . layoutPretty defaultLayoutOptions . (<> line) . renderTimings
 
 
-newtype Instant = Instant { getInstant :: SystemTime }
-  deriving (Eq, Ord, Show)
+type Instant = SystemTime
 
 since :: Instant -> Instant -> Duration
-since (Instant (MkSystemTime bs bns)) (Instant (MkSystemTime as ans)) = Duration (realToFrac (as - bs) + MkFixed (fromIntegral ans - fromIntegral bns))
+since (MkSystemTime bs bns) (MkSystemTime as ans) = Duration (realToFrac (as - bs) + MkFixed (fromIntegral ans - fromIntegral bns))
 {-# INLINABLE since #-}
 
 
 newtype Duration = Duration { getDuration :: Nano }
   deriving (Eq, Fractional, Num, Ord, Real, Show)
-
-now :: Has (Lift IO) sig m => m Instant
-now = Instant <$> sendIO getSystemTime
-{-# INLINABLE now #-}
