@@ -6,7 +6,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Control.Carrier.Time.System
 ( -- * Time carrier
-  Instant
+  Instant(..)
 , Duration(..)
 , since
 , time
@@ -26,14 +26,15 @@ import Control.Monad.Trans.Class (MonadTrans(..))
 import Data.Fixed
 import Data.Time.Clock.System
 
-type Instant = SystemTime
+newtype Instant = Instant { getInstant :: SystemTime }
+  deriving (Eq, Ord, Show)
 
 newtype Duration = Duration { getDuration :: Nano }
   deriving (Eq, Fractional, Num, Ord, Real, Show)
 
 
 since :: Instant -> Instant -> Duration
-since (MkSystemTime bs bns) (MkSystemTime as ans) = Duration (realToFrac (as - bs) + MkFixed (fromIntegral ans - fromIntegral bns))
+since (Instant (MkSystemTime bs bns)) (Instant (MkSystemTime as ans)) = Duration (realToFrac (as - bs) + MkFixed (fromIntegral ans - fromIntegral bns))
 {-# INLINABLE since #-}
 
 time :: Has (Time Instant) sig m => m a -> m (Duration, a)
@@ -48,8 +49,8 @@ instance MonadTrans TimeC where
   lift = TimeC
   {-# INLINE lift #-}
 
-instance Has (Lift IO) sig m => Algebra (Time SystemTime :+: sig) (TimeC m) where
+instance Has (Lift IO) sig m => Algebra (Time Instant :+: sig) (TimeC m) where
   alg hdl sig ctx = case sig of
-    L Now   -> (<$ ctx) <$> sendIO getSystemTime
+    L Now   -> (<$ ctx) . Instant <$> sendIO getSystemTime
     R other -> TimeC (alg (runTime . hdl) other ctx)
   {-# INLINE alg #-}
