@@ -40,6 +40,7 @@ library
   import: common
   hs-source-dirs: src
   exposed-modules:
+    Control.Carrier.Time.System
     Control.Effect.Time
   build-depends:
     , base >= 4.12 && < 5
