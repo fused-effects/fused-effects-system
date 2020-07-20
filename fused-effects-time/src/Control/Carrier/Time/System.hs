@@ -30,12 +30,6 @@ instance MonadTrans TimeC where
 
 instance Has (Lift IO) sig m => Algebra (Time SystemTime :+: sig) (TimeC m) where
   alg hdl sig ctx = case sig of
-    L Now            -> (<$ ctx) <$> sendIO getSystemTime
-    L (TimeWith f m) -> do
-      start <- sendIO getSystemTime
-      a <- hdl (m <$ ctx)
-      end <- sendIO getSystemTime
-      let d = f start end
-      d `seq` pure ((,) d <$> a)
-    R other          -> TimeC (alg (runTime . hdl) other ctx)
+    L Now   -> (<$ ctx) <$> sendIO getSystemTime
+    R other -> TimeC (alg (runTime . hdl) other ctx)
   {-# INLINE alg #-}
