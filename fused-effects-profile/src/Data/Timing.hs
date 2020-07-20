@@ -105,6 +105,7 @@ instance Monoid Timings where
 
 singleton :: Label -> Duration -> Timings -> Timings
 singleton l t = Timings . HashMap.singleton l . Timing t 1 t t 0
+{-# INLINE singleton #-}
 
 lookup :: Label -> Timings -> Maybe Timing
 lookup = coerce @(Label -> HashMap.HashMap Label Timing -> _) HashMap.lookup
