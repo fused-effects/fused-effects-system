@@ -32,7 +32,7 @@ import           Prelude hiding (lookup)
 import           System.IO (stderr)
 
 data Timing = Timing
-  { sum   :: !Duration
+  { total :: !Duration
   , min'  :: !Duration
   , max'  :: !Duration
   , count :: {-# UNPACK #-} !Int
@@ -48,11 +48,11 @@ instance Monoid Timing where
   {-# INLINE mempty #-}
 
 renderTiming :: Timing -> Doc AnsiStyle
-renderTiming t@Timing{ sum, min', max', count, sub } = table (map go fields) <> if null (unTimings sub) then mempty else nest 2 (line <> renderTimings sub)
+renderTiming t@Timing{ total, min', max', count, sub } = table (map go fields) <> if null (unTimings sub) then mempty else nest 2 (line <> renderTimings sub)
     where
     table = group . encloseSep (flatAlt "{ " "{") (flatAlt " }" "}") ", "
     fields
-      | count == 1 = [ (annotate (colorDull Green) "total", prettyMS sum) ]
+      | count == 1 = [ (annotate (colorDull Green) "total", prettyMS total) ]
       | otherwise  =
         [ (annotate (colorDull Green) "min", prettyMS min')
         , (annotate (colorDull Green) "mean", prettyMS (mean t))
@@ -62,7 +62,7 @@ renderTiming t@Timing{ sum, min', max', count, sub } = table (map go fields) <> 
     prettyMS = (<> annotate (colorDull White) "ms") . pretty . ($ "") . showFFloat @Double (Just 3) . (* 1000) . realToFrac
 
 mean :: Timing -> Duration
-mean Timing{ sum, count } = sum / fromIntegral count
+mean Timing{ total, count } = total / fromIntegral count
 {-# INLINE mean #-}
 
 
