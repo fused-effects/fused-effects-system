@@ -12,7 +12,6 @@ module Data.Timing
 , Label
 , label
 , Timings(..)
-, singleton
 , timing
 , lookup
 , renderTimings
@@ -93,12 +92,8 @@ instance Monoid Timings where
   mempty = Timings mempty
   {-# INLINE mempty #-}
 
-singleton :: Label -> Timing -> Timings
-singleton = coerce @(Label -> Timing -> _) HashMap.singleton
-{-# INLINE singleton #-}
-
 timing :: Label -> Duration -> Timings -> Timings
-timing l t = singleton l . Timing t 1 t t
+timing l t = Timings . HashMap.singleton l . Timing t 1 t t
 
 lookup :: Label -> Timings -> Maybe Timing
 lookup = coerce @(Label -> HashMap.HashMap Label Timing -> _) HashMap.lookup
