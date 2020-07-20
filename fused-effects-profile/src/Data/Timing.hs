@@ -48,12 +48,15 @@ newtype Total = Total { getTotal :: Duration }
 
 instance Semigroup Total where
   (<>) = coerce ((+) :: Duration -> Duration -> Duration)
+  {-# INLINE (<>) #-}
 
 instance Monoid Total where
   mempty = Total 0
+  {-# INLINE mempty #-}
 
 instance Unital Duration Total where
   unit = Total
+  {-# INLINE unit #-}
 
 
 newtype Count = Count { getCount :: Int }
@@ -61,20 +64,25 @@ newtype Count = Count { getCount :: Int }
 
 instance Semigroup Count where
   (<>) = coerce ((+) :: Int -> Int -> Int)
+  {-# INLINE (<>) #-}
 
 instance Monoid Count where
   mempty = Count 0
+  {-# INLINE mempty #-}
 
 instance Unital Duration Count where
   unit _ = Count 1
+  {-# INLINE unit #-}
 
 
 instance Ord a => Unital a (Min a) where
   unit = Min
+  {-# INLINE unit #-}
 
 
 instance Ord a => Unital a (Max a) where
   unit = Max
+  {-# INLINE unit #-}
 
 
 data Timing = Timing
