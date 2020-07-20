@@ -41,7 +41,7 @@ data Timing = Timing
   }
 
 instance Semigroup Timing where
-  Timing s1 c1 mn1 mx1 sb1 <> Timing s2 c2 mn2 mx2 sb2 = Timing (s1 + s2) (c1 + c2) (mn1 `min` mn2) (mx1 `max` mx2) (sb1 <> sb2)
+  Timing t1 c1 mn1 mx1 sb1 <> Timing t2 c2 mn2 mx2 sb2 = Timing (t1 + t2) (c1 + c2) (mn1 `min` mn2) (mx1 `max` mx2) (sb1 <> sb2)
   {-# INLINE (<>) #-}
 
 renderTiming :: Timing -> Doc AnsiStyle
