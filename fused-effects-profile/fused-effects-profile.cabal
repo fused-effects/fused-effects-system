@@ -51,6 +51,7 @@ library
     , fused-effects-time ^>= 0
     , prettyprinter ^>= 1.5
     , prettyprinter-ansi-terminal ^>= 1.1
+    , terminal-size ^>= 0.3
     , text ^>= 1.2
     , time ^>= 1.9
     , transformers >= 0.4 && < 0.6

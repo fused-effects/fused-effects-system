@@ -32,6 +32,7 @@ import           Data.Text.Prettyprint.Doc
 import           Data.Text.Prettyprint.Doc.Render.Terminal
 import           Numeric (showFFloat)
 import           Prelude hiding (lookup)
+import           System.Console.Terminal.Size as Size
 import           System.IO (stderr)
 
 data Timing = Timing
@@ -116,4 +117,6 @@ renderTimings (Timings ts) = vsep (map go (sortOn (Down . mean . snd) (HashMap.t
   go (k, v) = annotate (color Green) (pretty k) <> pretty ':' <> softline <> renderTiming v
 
 reportTimings :: Has (Lift IO) sig m => Timings -> m ()
-reportTimings = sendM . renderIO stderr . layoutPretty defaultLayoutOptions . (<> line) . renderTimings
+reportTimings t = do
+  s <- maybe 80 Size.width <$> sendM size
+  sendM (renderIO stderr (layoutPretty defaultLayoutOptions{ layoutPageWidth = AvailablePerLine s 0.8 } (renderTimings t <> line)))
