@@ -54,7 +54,7 @@ newtype ProfileC m a = ProfileC { runProfileC :: WriterC Timings m a }
 instance Has (Time Instant) sig m => Algebra (Profile :+: sig) (ProfileC m) where
   alg hdl sig ctx = case sig of
     L (Measure l m) -> do
-      (duration, (sub, a)) <- time (ProfileC (listen @Timings (runProfileC (hdl (m <$ ctx)))))
+      (sub, (duration, a)) <- ProfileC (listen @Timings (runProfileC (time (hdl (m <$ ctx)))))
       let t = lookup l sub
       -- subtract re-entrant measurements so we don’t count them twice
       a <$ ProfileC (tell (timing l (maybe duration ((duration -) . sum) t)))

@@ -48,7 +48,7 @@ newtype ProfileC m a = ProfileC { runProfileC :: WriterC Timings m a }
 instance Has (Time Instant) sig m => Algebra (Profile :+: sig) (ProfileC m) where
   alg hdl sig ctx = case sig of
     L (Measure l m) -> do
-      (duration, (sub, a)) <- time (ProfileC (censor @Timings (const mempty) (listen (runProfileC (hdl (m <$ ctx))))))
+      (sub, (duration, a)) <- ProfileC (censor @Timings (const mempty) (listen (runProfileC (time (hdl (m <$ ctx))))))
       a <$ ProfileC (tell (timing l duration sub))
     R other         -> ProfileC (alg (runProfileC . hdl) (R other) ctx)
     where
