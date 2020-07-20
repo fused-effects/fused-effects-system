@@ -1,4 +1,5 @@
 {-# LANGUAGE DisambiguateRecordFields #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -30,6 +31,7 @@ import           Data.Coerce
 import qualified Data.HashMap.Strict as HashMap
 import           Data.List (sortOn)
 import           Data.Ord (Down(..))
+import           Data.Semigroup (Max(..), Min(..))
 import           Data.Text (Text, pack)
 import           Data.Text.Prettyprint.Doc
 import           Data.Text.Prettyprint.Doc.Render.Terminal
@@ -67,37 +69,19 @@ instance Unital Duration Count where
   unit _ = Count 1
 
 
-newtype Min = Min { getMin :: Duration }
-  deriving (Eq, Ord, Show)
-
-instance Semigroup Min where
-  (<>) = min
-
-instance Monoid Min where
-  mempty = Min 0
-
-instance Unital Duration Min where
+instance Ord a => Unital a (Min a) where
   unit = Min
 
 
-newtype Max = Max { getMax :: Duration }
-  deriving (Eq, Ord, Show)
-
-instance Semigroup Max where
-  (<>) = max
-
-instance Monoid Max where
-  mempty = Max 0
-
-instance Unital Duration Max where
+instance Ord a => Unital a (Max a) where
   unit = Max
 
 
 data Timing = Timing
   { total :: !Total
   , count :: {-# UNPACK #-} !Count
-  , min'  :: !Min
-  , max'  :: !Max
+  , min'  :: !(Min Duration)
+  , max'  :: !(Max Duration)
   , sub   :: !Timings
   }
 
