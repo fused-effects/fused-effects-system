@@ -1,10 +1,13 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 module Control.Effect.Time
 ( -- * Time effect
   now
 , timeWith
 , epoch
+, era
 , Time(..)
   -- * Re-exports
 , Algebra
@@ -32,6 +35,11 @@ epoch :: Has (Time instant) sig m => m instant
 epoch = send Epoch
 {-# INLINE epoch #-}
 
+era :: forall instant m a sig . Has (Time instant) sig m => m a -> m a
+era m = send (Era m :: Time instant m a)
+{-# INLINE era #-}
+
 data Time instant (m :: Type -> Type) k where
-  Now   :: Time instant m instant
-  Epoch :: Time instant m instant
+  Now   ::        Time instant m instant
+  Epoch ::        Time instant m instant
+  Era   :: m a -> Time instant m a
