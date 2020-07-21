@@ -19,6 +19,7 @@ module Control.Carrier.Time.System
 import Control.Algebra
 import Control.Applicative (Alternative)
 import Control.Carrier.Lift
+import Control.Carrier.Reader
 import Control.Effect.Time
 import Control.Monad (MonadPlus)
 import Control.Monad.Fix (MonadFix)
@@ -43,19 +44,18 @@ time = timeWith since
 {-# INLINE time #-}
 
 
-runTime :: TimeC m a -> m a
-runTime (TimeC m) = m
+runTime :: Has (Lift IO) sig m => TimeC m a -> m a
+runTime (TimeC m) = do
+  epoch <- sendIO getSystemTime
+  runReader (Instant epoch) m
 {-# INLINE runTime #-}
 
-newtype TimeC m a = TimeC { runTimeC :: m a }
-  deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus)
-
-instance MonadTrans TimeC where
-  lift = TimeC
-  {-# INLINE lift #-}
+newtype TimeC m a = TimeC { runTimeC :: ReaderC Instant m a }
+  deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus, MonadTrans)
 
 instance Has (Lift IO) sig m => Algebra (Time Instant :+: sig) (TimeC m) where
   alg hdl sig ctx = case sig of
     L Now   -> (<$ ctx) . Instant <$> sendIO getSystemTime
-    R other -> TimeC (alg (runTimeC . hdl) other ctx)
+    L Epoch -> TimeC (asks (<$ ctx))
+    R other -> TimeC (alg (runTimeC . hdl) (R other) ctx)
   {-# INLINE alg #-}
