@@ -19,9 +19,9 @@ module Control.Carrier.Profile.Tree
 import Control.Algebra
 import Control.Applicative (Alternative)
 import Control.Carrier.Lift
-import Control.Carrier.Time.System
 import Control.Carrier.Writer.Church
 import Control.Effect.Profile
+import Control.Effect.Time.System
 import Control.Monad (MonadPlus)
 import Control.Monad.Fix
 import Control.Monad.IO.Class

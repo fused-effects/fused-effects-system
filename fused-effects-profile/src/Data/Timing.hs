@@ -21,8 +21,8 @@ module Data.Timing
 , since
 ) where
 
-import           Control.Carrier.Time.System
 import           Control.Effect.Lift
+import           Control.Effect.Time.System
 import           Data.Coerce
 import qualified Data.HashMap.Strict as HashMap
 import           Data.List (sortOn)
