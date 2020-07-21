@@ -16,7 +16,7 @@ module Data.Timing
 , lookup
 , renderTimings
 , reportTimings
-, Instant
+, Instant(..)
 , Duration(..)
 , since
 ) where
