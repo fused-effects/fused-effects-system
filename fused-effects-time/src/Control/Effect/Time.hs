@@ -4,6 +4,7 @@ module Control.Effect.Time
 ( -- * Time effect
   now
 , timeWith
+, epoch
 , Time(..)
   -- * Re-exports
 , Algebra
@@ -27,5 +28,10 @@ timeWith with m = do
   d `seq` pure (d, a)
 {-# INLINE timeWith #-}
 
+epoch :: Has (Time instant) sig m => m instant
+epoch = send Epoch
+{-# INLINE epoch #-}
+
 data Time instant (m :: Type -> Type) k where
-  Now :: Time instant m instant
+  Now   :: Time instant m instant
+  Epoch :: Time instant m instant
