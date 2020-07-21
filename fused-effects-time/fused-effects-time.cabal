@@ -43,6 +43,7 @@ library
     Control.Carrier.Time.System
     Control.Carrier.Time.System.Specialized
     Control.Effect.Time
+    Control.Effect.Time.System
   build-depends:
     , base >= 4.12 && < 5
     , fused-effects ^>= 1.1
