@@ -10,7 +10,8 @@ module Control.Carrier.Time.System
 , Duration(..)
 , since
 , time
-, TimeC(..)
+, runTime
+, TimeC(TimeC)
   -- * Time effect
 , module Control.Effect.Time
 ) where
@@ -42,7 +43,11 @@ time = timeWith since
 {-# INLINE time #-}
 
 
-newtype TimeC m a = TimeC { runTime :: m a }
+runTime :: TimeC m a -> m a
+runTime (TimeC m) = m
+{-# INLINE runTime #-}
+
+newtype TimeC m a = TimeC { runTimeC :: m a }
   deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadFix, MonadIO, MonadPlus)
 
 instance MonadTrans TimeC where
@@ -52,5 +57,5 @@ instance MonadTrans TimeC where
 instance Has (Lift IO) sig m => Algebra (Time Instant :+: sig) (TimeC m) where
   alg hdl sig ctx = case sig of
     L Now   -> (<$ ctx) . Instant <$> sendIO getSystemTime
-    R other -> TimeC (alg (runTime . hdl) other ctx)
+    R other -> TimeC (alg (runTimeC . hdl) other ctx)
   {-# INLINE alg #-}
