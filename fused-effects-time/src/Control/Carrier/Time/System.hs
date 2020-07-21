@@ -2,16 +2,11 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Control.Carrier.Time.System
 ( -- * Time carrier
-  since
-, time
-, sinceEpoch
-, era
-, runTime
+  runTime
 , TimeC(TimeC)
   -- * Time effect
 , module Control.Effect.Time.System
@@ -26,27 +21,7 @@ import Control.Monad (MonadPlus)
 import Control.Monad.Fix (MonadFix)
 import Control.Monad.IO.Class (MonadIO)
 import Control.Monad.Trans.Class (MonadTrans(..))
-import Data.Fixed
 import Data.Time.Clock.System
-
-since :: Instant -> Instant -> Duration
-since (Instant (MkSystemTime bs bns)) (Instant (MkSystemTime as ans)) = Duration (realToFrac (as - bs) + MkFixed (fromIntegral ans - fromIntegral bns))
-{-# INLINABLE since #-}
-
-time :: Has (Time Instant) sig m => m a -> m (Duration, a)
-time = timeWith since
-{-# INLINE time #-}
-
-sinceEpoch :: Has (Time Instant) sig m => m Duration
-sinceEpoch = sinceEpochWith since
-{-# INLINE sinceEpoch #-}
-
-era :: Has (Time Instant) sig m => m a -> m a
-era m = do
-  epoch <- now @Instant
-  eraFrom epoch m
-{-# INLINE era #-}
-
 
 runTime :: Has (Lift IO) sig m => TimeC m a -> m a
 runTime (TimeC m) = do
