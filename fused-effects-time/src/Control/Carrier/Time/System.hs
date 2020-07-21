@@ -11,6 +11,7 @@ module Control.Carrier.Time.System
 , Duration(..)
 , since
 , time
+, sinceEpoch
 , era
 , runTime
 , TimeC(TimeC)
@@ -44,6 +45,10 @@ since (Instant (MkSystemTime bs bns)) (Instant (MkSystemTime as ans)) = Duration
 time :: Has (Time Instant) sig m => m a -> m (Duration, a)
 time = timeWith since
 {-# INLINE time #-}
+
+sinceEpoch :: Has (Time Instant) sig m => m Duration
+sinceEpoch = sinceEpochWith since
+{-# INLINE sinceEpoch #-}
 
 era :: Has (Time Instant) sig m => m a -> m a
 era m = do
