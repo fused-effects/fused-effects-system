@@ -55,7 +55,10 @@ newtype TimeC m a = TimeC { runTimeC :: ReaderC Instant m a }
 
 instance Has (Lift IO) sig m => Algebra (Time Instant :+: sig) (TimeC m) where
   alg hdl sig ctx = case sig of
-    L Now   -> (<$ ctx) . Instant <$> sendIO getSystemTime
-    L Epoch -> TimeC (asks (<$ ctx))
-    R other -> TimeC (alg (runTimeC . hdl) (R other) ctx)
+    L Now     -> (<$ ctx) . Instant <$> sendIO getSystemTime
+    L Epoch   -> TimeC (asks (<$ ctx))
+    L (Era m) -> do
+      epoch <- Instant <$> sendIO getSystemTime
+      TimeC (local (const epoch) (runTimeC (hdl (m <$ ctx))))
+    R other   -> TimeC (alg (runTimeC . hdl) (R other) ctx)
   {-# INLINE alg #-}
