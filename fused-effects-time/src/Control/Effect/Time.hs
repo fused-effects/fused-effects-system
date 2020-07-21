@@ -4,6 +4,7 @@ module Control.Effect.Time
   now
 , timeWith
 , epoch
+, sinceEpochWith
 , eraFrom
 , Time(..)
   -- * Re-exports
@@ -30,6 +31,14 @@ timeWith with m = do
 epoch :: Has (Time instant) sig m => m instant
 epoch = send Epoch
 {-# INLINE epoch #-}
+
+sinceEpochWith :: Has (Time instant) sig m => (instant -> instant -> delta) -> m delta
+sinceEpochWith with = do
+  now <- now
+  epoch <- epoch
+  let d = with epoch now
+  d `seq` pure d
+{-# INLINE sinceEpochWith #-}
 
 eraFrom :: Has (Time instant) sig m => instant -> m a -> m a
 eraFrom t m = send (EraFrom t m)
