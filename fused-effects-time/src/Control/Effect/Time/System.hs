@@ -1,2 +1,5 @@
 module Control.Effect.Time.System
-() where
+( module Control.Effect.Time
+) where
+
+import Control.Effect.Time
