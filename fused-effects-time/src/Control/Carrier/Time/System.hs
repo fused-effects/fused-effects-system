@@ -46,8 +46,8 @@ time = timeWith since
 
 runTime :: Has (Lift IO) sig m => TimeC m a -> m a
 runTime (TimeC m) = do
-  epoch <- sendIO getSystemTime
-  runReader (Instant epoch) m
+  epoch <- Instant <$> sendIO getSystemTime
+  runReader epoch m
 {-# INLINE runTime #-}
 
 newtype TimeC m a = TimeC { runTimeC :: ReaderC Instant m a }
