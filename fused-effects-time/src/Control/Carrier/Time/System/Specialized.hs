@@ -5,7 +5,7 @@ module Control.Carrier.Time.System.Specialized
 ) where
 
 import Control.Algebra
-import Control.Carrier.Time.System hiding (epoch, eraFrom, now, timeWith)
+import Control.Carrier.Time.System hiding (epoch, now)
 
 now :: Has (Time Instant) sig m => m Instant
 now = send Now
