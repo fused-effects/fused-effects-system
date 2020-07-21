@@ -9,32 +9,24 @@ module Control.Carrier.Time.System.Specialized
 
 import Control.Algebra
 import Control.Carrier.Time.System hiding (epoch, eraFrom, now, sinceEpochWith, timeWith)
+import qualified Control.Effect.Time as T
 
 now :: Has (Time Instant) sig m => m Instant
-now = send Now
+now = T.now
 {-# INLINE now #-}
 
 timeWith :: Has (Time Instant) sig m => (Instant -> Instant -> delta) -> m a -> m (delta, a)
-timeWith with m = do
-  start <- now
-  a <- m
-  end <- now
-  let d = with start end
-  d `seq` pure (d, a)
+timeWith = T.timeWith
 {-# INLINE timeWith #-}
 
 epoch :: Has (Time Instant) sig m => m Instant
-epoch = send Epoch
+epoch = T.epoch
 {-# INLINE epoch #-}
 
 sinceEpochWith :: Has (Time Instant) sig m => (Instant -> Instant -> delta) -> m delta
-sinceEpochWith with = do
-  now <- now
-  epoch <- epoch
-  let d = with epoch now
-  d `seq` pure d
+sinceEpochWith = T.sinceEpochWith
 {-# INLINE sinceEpochWith #-}
 
 eraFrom :: Has (Time Instant) sig m => Instant -> m a -> m a
-eraFrom t m = send (EraFrom t m)
+eraFrom = T.eraFrom
 {-# INLINE eraFrom #-}
