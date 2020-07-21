@@ -4,7 +4,7 @@ module Control.Effect.Time
   now
 , timeWith
 , epoch
-, era
+, eraFrom
 , Time(..)
   -- * Re-exports
 , Algebra
@@ -31,11 +31,11 @@ epoch :: Has (Time instant) sig m => m instant
 epoch = send Epoch
 {-# INLINE epoch #-}
 
-era :: Has (Time instant) sig m => instant -> m a -> m a
-era t m = send (Era t m)
-{-# INLINE era #-}
+eraFrom :: Has (Time instant) sig m => instant -> m a -> m a
+eraFrom t m = send (EraFrom t m)
+{-# INLINE eraFrom #-}
 
 data Time instant m k where
-  Now   ::                   Time instant m instant
-  Epoch ::                   Time instant m instant
-  Era   :: instant -> m a -> Time instant m a
+  Now     ::                   Time instant m instant
+  Epoch   ::                   Time instant m instant
+  EraFrom :: instant -> m a -> Time instant m a
