@@ -2,6 +2,7 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Control.Carrier.Time.System
@@ -10,6 +11,7 @@ module Control.Carrier.Time.System
 , Duration(..)
 , since
 , time
+, era
 , runTime
 , TimeC(TimeC)
   -- * Time effect
@@ -42,6 +44,12 @@ since (Instant (MkSystemTime bs bns)) (Instant (MkSystemTime as ans)) = Duration
 time :: Has (Time Instant) sig m => m a -> m (Duration, a)
 time = timeWith since
 {-# INLINE time #-}
+
+era :: Has (Time Instant) sig m => m a -> m a
+era m = do
+  epoch <- now @Instant
+  eraFrom epoch m
+{-# INLINE era #-}
 
 
 runTime :: Has (Lift IO) sig m => TimeC m a -> m a
