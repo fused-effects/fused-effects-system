@@ -1,2 +1,5 @@
 module Control.Carrier.Time.System.Specialized
-() where
+( module Control.Carrier.Time.System
+) where
+
+import Control.Carrier.Time.System
