@@ -3,10 +3,11 @@ module Control.Carrier.Time.System.Specialized
 , now
 , timeWith
 , epoch
+, eraFrom
 ) where
 
 import Control.Algebra
-import Control.Carrier.Time.System hiding (epoch, now, timeWith)
+import Control.Carrier.Time.System hiding (epoch, eraFrom, now, timeWith)
 
 now :: Has (Time Instant) sig m => m Instant
 now = send Now
@@ -24,3 +25,7 @@ timeWith with m = do
 epoch :: Has (Time Instant) sig m => m Instant
 epoch = send Epoch
 {-# INLINE epoch #-}
+
+eraFrom :: Has (Time Instant) sig m => Instant -> m a -> m a
+eraFrom t m = send (EraFrom t m)
+{-# INLINE eraFrom #-}
