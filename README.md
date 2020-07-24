@@ -1,3 +1,7 @@
+# `fused-effects-system`
+
+This repo provides a suite of Haskell packages for systems programming using `fused-effects`.
+
 ## [`fused-effects-profile`][]
 
 Profiling using `fused-effects`.
