@@ -1,9 +1,11 @@
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE KindSignatures #-}
 module Control.Effect.Time
 ( -- * Time effect
   now
 , timeWith
+, epoch
+, sinceEpochWith
+, eraFrom
 , Time(..)
   -- * Re-exports
 , Algebra
@@ -12,7 +14,6 @@ module Control.Effect.Time
 ) where
 
 import Control.Algebra
-import Data.Kind (Type)
 
 now :: Has (Time instant) sig m => m instant
 now = send Now
@@ -27,5 +28,23 @@ timeWith with m = do
   d `seq` pure (d, a)
 {-# INLINE timeWith #-}
 
-data Time instant (m :: Type -> Type) k where
-  Now :: Time instant m instant
+epoch :: Has (Time instant) sig m => m instant
+epoch = send Epoch
+{-# INLINE epoch #-}
+
+sinceEpochWith :: Has (Time instant) sig m => (instant -> instant -> delta) -> m delta
+sinceEpochWith with = do
+  now <- now
+  epoch <- epoch
+  let d = with epoch now
+  d `seq` pure d
+{-# INLINE sinceEpochWith #-}
+
+eraFrom :: Has (Time instant) sig m => instant -> m a -> m a
+eraFrom t m = send (EraFrom t m)
+{-# INLINE eraFrom #-}
+
+data Time instant m k where
+  Now     ::                   Time instant m instant
+  Epoch   ::                   Time instant m instant
+  EraFrom :: instant -> m a -> Time instant m a

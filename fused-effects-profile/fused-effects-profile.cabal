@@ -53,6 +53,5 @@ library
     , prettyprinter-ansi-terminal ^>= 1.1
     , terminal-size ^>= 0.3
     , text ^>= 1.2
-    , time ^>= 1.9
     , transformers >= 0.4 && < 0.6
     , unordered-containers ^>= 0.2
