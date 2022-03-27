@@ -45,5 +45,5 @@ library
   build-depends:
     , base >= 4.12 && < 5
     , fused-effects ^>= 1.1
-    , time ^>= 1.9
-    , transformers >= 0.4 && < 0.6
+    , time >= 1.9 && < 1.14
+    , transformers >= 0.4 && < 0.7
