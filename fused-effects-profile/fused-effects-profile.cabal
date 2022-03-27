@@ -49,10 +49,10 @@ library
     , base >= 4.12 && < 5
     , fused-effects ^>= 1.1
     , fused-effects-time ^>= 0
-    , prettyprinter ^>= 1.5
+    , prettyprinter >= 1.5 && 1.8
     , prettyprinter-ansi-terminal ^>= 1.1
     , terminal-size ^>= 0.3
-    , text ^>= 1.2
-    , time ^>= 1.9
-    , transformers >= 0.4 && < 0.6
+    , text >= 1.2 && < 2.1
+    , time >= 1.9 && < 1.14
+    , transformers >= 0.4 && < 0.7
     , unordered-containers ^>= 0.2
