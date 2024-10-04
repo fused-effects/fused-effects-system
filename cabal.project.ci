@@ -1,0 +1,9 @@
+packages:
+  fused-effects-profile
+  fused-effects-time
+
+package fused-effects-profile
+  ghc-options: -Werror
+
+package fused-effects-time
+  ghc-options: -Werror

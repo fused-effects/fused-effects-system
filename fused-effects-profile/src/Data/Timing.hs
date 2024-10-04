@@ -28,10 +28,10 @@ import qualified Data.HashMap.Strict as HashMap
 import           Data.List (sortOn)
 import           Data.Ord (Down(..))
 import           Data.Text (Text, pack)
-import           Data.Text.Prettyprint.Doc
-import           Data.Text.Prettyprint.Doc.Render.Terminal
 import           Numeric (showFFloat)
 import           Prelude hiding (lookup)
+import           Prettyprinter
+import           Prettyprinter.Render.Terminal
 import           System.Console.Terminal.Size as Size
 import           System.IO (stderr)
 

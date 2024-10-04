@@ -1,4 +1,4 @@
-cabal-version:       2.2
+cabal-version:       3.0
 
 name:                fused-effects-time
 version:             0.0.0.0
@@ -10,9 +10,9 @@ license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Rob Rix
 maintainer:          rob.rix@me.com
-copyright:           2020 Rob Rix
+copyright:           2020–2024 Rob Rix
 category:            System
-extra-source-files:
+extra-doc-files:
   CHANGELOG.md
   README.md
 
@@ -35,6 +35,13 @@ common common
     ghc-options:
       -Wno-missing-safe-haskell-mode
       -Wno-prepositive-qualified-module
+  if (impl(ghc >= 9.2))
+    ghc-options:
+      -Wno-missing-kind-signatures
+  if (impl(ghc >= 9.8))
+    ghc-options:
+      -Wno-missing-role-annotations
+      -Wno-term-variable-capture
 
 library
   import: common
@@ -45,5 +52,5 @@ library
   build-depends:
     , base >= 4.12 && < 5
     , fused-effects ^>= 1.1
-    , time >= 1.9 && < 1.14
+    , time >= 1.9 && < 1.15
     , transformers >= 0.4 && < 0.7
